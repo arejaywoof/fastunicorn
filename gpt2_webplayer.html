@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>M3U8 Video.js Playlist Player</title>
+  <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
+  <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    header {
+      background-color: #1e1e1e;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    #topbar {
+      background-color: #1a1a1a;
+      padding: 0.75rem 1rem;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    input[type="file"],
+    input[type="text"],
+    button {
+      background: #2c2c2c;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+    }
+    input[type="text"] {
+      flex: 1;
+    }
+    button:hover {
+      background: #444;
+      cursor: pointer;
+    }
+    #container {
+      display: flex;
+      height: calc(100vh - 130px);
+    }
+    #sidebar {
+      width: 300px;
+      overflow-y: auto;
+      background-color: #1a1a1a;
+      padding: 1rem;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+    }
+    #player {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+    details {
+      margin-bottom: 1rem;
+    }
+    summary {
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #2a2a2a;
+      padding: 0.5rem;
+      border-radius: 4px;
+      color: #00bcd4;
+    }
+    summary:hover {
+      background-color: #3a3a3a;
+    }
+    .channel {
+      display: flex;
+      align-items: center;
+      margin: 0.25rem 0;
+      padding: 0.4rem;
+      cursor: pointer;
+      border-radius: 4px;
+      background-color: #2c2c2c;
+    }
+    .channel:hover {
+      background-color: #444;
+    }
+	.selected-channel {
+	  background-color: #1e4078 !important;  //dark blue 
+	  color: #fff;
+	}
+    .channel img {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+      border-radius: 4px;
+      object-fit: contain;
+      background-color: #000;
+    }
+    .video-js {
+      width: 100%;
+      max-width: 960px;
+      height: 540px;
+      background: black;
+    }
+    #streamInfo {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  M3U8 Playlist Player (Video.js)
+</header>
+
+<div id="topbar">
+  <input type="file" id="fileInput" accept=".m3u,.m3u8">
+  <input type="text" id="urlInput" placeholder="Paste a .m3u8 URL here...">
+  <button onclick="playFromInput()">Play</button>
+</div>
+
+<div id="container">
+  <div id="sidebar"></div>
+  <div id="player">
+    <video id="video" class="video-js vjs-default-skin" controls autoplay></video>
+    <div id="streamInfo"></div>
+  </div>
+</div>
+
+<script>
+
+  const player = videojs('video');
+  const sidebar = document.getElementById('sidebar');
+  let allChannels = {}; // store all parsed channels for search
+  let currentSelectedChannel = null;
+
+  document.getElementById('fileInput').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    parsePlaylist(text);
+  });
+
+  function parsePlaylist(data) {
+  const lines = data.split('\n');
+  const channels = {};
+  let currentGroup = 'Uncategorized';
+  let currentName = '';
+  let currentLogo = '';
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (line.startsWith('#EXTINF')) {
+      // Parse group-title
+      const groupStart = line.indexOf('group-title="');
+      if (groupStart !== -1) {
+        const groupEnd = line.indexOf('"', groupStart + 13);
+        if (groupEnd !== -1) {
+          currentGroup = line.slice(groupStart + 13, groupEnd);
+        }
+      } else {
+        currentGroup = 'Uncategorized';
+      }
+
+      // Parse tvg-logo
+      const logoStart = line.indexOf('tvg-logo="');
+      if (logoStart !== -1) {
+        const logoEnd = line.indexOf('"', logoStart + 10);
+        currentLogo = logoEnd !== -1 ? line.slice(logoStart + 10, logoEnd) : '';
+      } else {
+        currentLogo = '';
+      }
+
+      // Parse name (everything after the last comma)
+      const commaIdx = line.lastIndexOf(',');
+      currentName = commaIdx !== -1 ? line.slice(commaIdx + 1).trim() : 'Unnamed';
+
+    } else if (line.startsWith('http')) {
+      const url = line;
+
+      // ✅ Skip non-.m3u8 and unwanted formats
+      if (url.endsWith('.mp4') || url.endsWith('.mkv')) continue;
+      if (!url.endsWith('.m3u8')) continue;
+
+      // Reuse object allocation
+      const channel = {
+        name: currentName,
+        url: url,
+        logo: currentLogo
+      };
+
+      if (!channels[currentGroup]) {
+        channels[currentGroup] = [channel];
+      } else {
+        channels[currentGroup].push(channel);
+      }
+    }
+  }
+
+  renderSidebar(channels);
+}
+
+
+  function renderSidebar(channels) {
+    allChannels = channels;
+    sidebar.innerHTML = '';
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.id = 'searchBox';
+    searchInput.placeholder = 'Search channels...';
+    searchInput.style = `
+      width: 100%;
+      padding: 8px;
+      background: #2c2c2c;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    `;
+    sidebar.appendChild(searchInput);
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = {};
+
+      for (const group in allChannels) {
+        const matches = allChannels[group].filter(channel =>
+          channel.name.toLowerCase().includes(query)
+        );
+        if (matches.length > 0) {
+          filtered[group] = matches;
+        }
+      }
+
+      renderFilteredResults(filtered);
+    });
+
+    renderFilteredResults(allChannels);
+  }
+
+  function renderFilteredResults(filteredChannels) {
+    const searchBox = document.getElementById('searchBox');
+    sidebar.innerHTML = '';
+    sidebar.appendChild(searchBox);
+
+    for (const group in filteredChannels) {
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = group;
+      details.appendChild(summary);
+
+      filteredChannels[group].forEach(channel => {
+        const ch = document.createElement('div');
+        ch.className = 'channel';
+        ch.addEventListener('click', () => {
+			playStream(channel.url);
+
+			// Update selected channel style
+			if (currentSelectedChannel) {
+				currentSelectedChannel.classList.remove('selected-channel');
+			}
+		ch.classList.add('selected-channel');
+		currentSelectedChannel = ch;
+		});
+
+
+        if (channel.logo) {
+          const img = document.createElement('img');
+          img.src = channel.logo;
+          img.alt = 'logo';
+          ch.appendChild(img);
+        }
+
+        const label = document.createElement('span');
+        label.textContent = channel.name;
+        ch.appendChild(label);
+
+        details.appendChild(ch);
+      });
+
+      sidebar.appendChild(details);
+    }
+  }
+
+  function playStream(url) {
+    player.pause();
+    player.src({ src: url, type: 'application/x-mpegURL' });
+    player.play();
+  }
+
+  function playFromInput() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (url && url.endsWith('.m3u8')) {
+      playStream(url);
+    } else {
+      alert("Please enter a valid .m3u8 URL.");
+    }
+  }
+
+  player.on('loadedmetadata', () => {
+    const videoEl = player.el().querySelector('video');
+    const infoBox = document.getElementById('streamInfo');
+
+    const width = videoEl.videoWidth;
+    const height = videoEl.videoHeight;
+    const resolution = `${width}x${height}`;
+
+    let audioInfo = 'i dunno man';
+    if (videoEl.audioTracks && videoEl.audioTracks.length > 0) {
+      const track = videoEl.audioTracks[0];
+      if (track.label) {
+        audioInfo = track.label;
+      } else {
+        audioInfo = `${track.language || 'und'} (${track.kind})`;
+      }
+    }
+
+    let codecInfo = 'Codec info not available';
+    try {
+      const videoTracks = videoEl.videoTracks;
+      if (videoTracks && videoTracks.length > 0) {
+        codecInfo = videoTracks[0].label || 'Video Track Present';
+      }
+    } catch (e) {}
+
+    infoBox.innerHTML = `
+      <strong>Stream Info:</strong><br>
+      Resolution: ${resolution}<br>
+      Audio: ${audioInfo}<br>
+      ${codecInfo ? `Video: ${codecInfo}` : ''}
+    `;
+  });
+</script>
+
+</body>
+</html>
