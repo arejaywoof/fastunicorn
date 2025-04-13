@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local M3U8 IPTV Player (Dark)</title>
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <link href="https://unpkg.com/@videojs/themes@1/dist/city/index.css" rel="stylesheet">
+    <style>
+        /* --- Dark UI Theme --- */
+        :root {
+            --primary-color: #58A6FF; /* Brighter Blue for dark mode */
+            --primary-light: #2D3748; /* Dark Blue/Gray for headers */
+            --primary-dark: #3182CE;  /* Slightly darker blue */
+            --accent-color: #39D3BB; /* Brighter Aquamarine for dark mode */
+            --accent-light: #2A4C46; /* Dark Teal for playing bg */
+            --accent-dark: #A6F1E4;  /* Light Teal for playing text */
+
+            --text-primary: #EAEAEA; /* Light Gray/Off White */
+            --text-secondary: #B0B0B0;/* Medium Gray */
+            --text-muted: #888888;   /* Gray */
+
+            --bg-page: #1A1A1A;     /* Very Dark Gray */
+            --bg-container: #2C2C2C; /* Dark Gray */
+            --bg-sidebar: #252525;  /* Slightly darker sidebar */
+            --bg-input: #383838;    /* Input background */
+
+            --border-color: #444444; /* Dark Gray */
+            --border-input: #555555; /* Medium Dark Gray */
+
+            --hover-bg: #3A3A3A;    /* Slightly Lighter Dark Gray */
+            --shadow-color: rgba(0, 0, 0, 0.3); /* Darker shadow */
+
+            --error-bg: #58151c; /* Dark Red background */
+            --error-text: #f8d7da; /* Light Red text */
+            --error-border: #a12631;/* Darker Red border */
+            --warning-bg: #664d03; /* Dark Yellow background */
+            --warning-text: #fff3cd; /* Light Yellow text */
+            --warning-border: #b99105;/* Darker Yellow border */
+        }
+
+        /* Basic styling for layout, list, and player */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+        }
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            text-align: center;
+            font-weight: 600;
+        }
+        .container {
+            display: flex;
+            flex-grow: 1;
+            gap: 25px;
+            overflow: hidden;
+            background-color: var(--bg-container);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+        #sidebar {
+            width: 350px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-sidebar); /* Different sidebar bg */
+            overflow: hidden;
+            border-right: 1px solid var(--border-color);
+            padding: 15px; /* Adjusted padding */
+            border-radius: 8px; /* Rounded sidebar */
+        }
+        #player-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        #file-input-section, #filter-section {
+             margin-bottom: 20px;
+        }
+        #file-input-section label, #filter-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+        #m3uFile, #channel-filter {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-input);
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+            background-color: var(--bg-input); /* Input background */
+            color: var(--text-primary); /* Input text color */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #m3uFile::placeholder, #channel-filter::placeholder {
+            color: var(--text-muted); /* Placeholder text color */
+        }
+        #m3uFile:focus, #channel-filter:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3); /* Adjusted focus ring for dark */
+            outline: none;
+        }
+        /* Style file input button */
+        #m3uFile::file-selector-button {
+            padding: 8px 12px;
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            color: var(--bg-page); /* Dark text on bright button */
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-right: 10px;
+        }
+        #m3uFile::file-selector-button:hover {
+             background-color: var(--primary-dark);
+        }
+
+        #channel-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-top: 5px;
+            margin-top: 10px; /* Added margin top */
+            border-top: 1px solid var(--border-color); /* Add separator */
+        }
+        #channel-list ul {
+            padding-left: 0;
+            list-style: none;
+            margin: 0;
+        }
+        .category {
+            margin-bottom: 1px; /* Reduced space between categories */
+        }
+        .category > .category-header {
+            cursor: pointer;
+            font-weight: 600;
+            padding: 10px 15px;
+            background-color: var(--primary-light); /* Darker header bg */
+            border-radius: 0px; /* Sharp corners for header */
+             margin-bottom: 0px; /* Remove space below header */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+            color: var(--primary-color); /* Brighter text on dark header */
+            border: none;
+            border-bottom: 1px solid var(--border-color); /* Separator line */
+        }
+        .category > .category-header:hover {
+            background-color: rgba(88, 166, 255, 0.2); /* Slightly lighter on hover */
+        }
+         .category > .category-header::after {
+            content: '▶';
+            font-size: 0.7em;
+            margin-left: 8px;
+            transition: transform 0.2s ease;
+            color: var(--primary-color);
+         }
+        .category.expanded > .category-header::after {
+            transform: rotate(90deg);
+        }
+        .channels {
+            display: none;
+            padding-left: 0; /* Remove indent */
+            border-left: none; /* Remove indent line */
+            margin-left: 0;
+            margin-top: 0;
+            background-color: var(--bg-container); /* Background for channel list area */
+        }
+        .category.expanded > .channels {
+            display: block;
+        }
+        .channel-item {
+            cursor: pointer;
+            padding: 8px 20px; /* Adjusted padding */
+            border-radius: 0px; /* Sharp corners */
+            margin-bottom: 0px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            border-bottom: 1px solid var(--border-color); /* Separator */
+        }
+        .channel-item:last-child {
+             border-bottom: none; /* Remove border for last item in list */
+        }
+        .channel-item:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+        .channel-item.playing {
+            background-color: var(--accent-light);
+            font-weight: 600;
+            color: var(--accent-dark);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 17px; /* Adjust padding for border */
+            border-bottom-color: transparent; /* Hide bottom border when playing */
+        }
+        #player-container {
+            flex-grow: 1;
+            background-color: black;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            min-height: 250px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4); /* Adjusted shadow */
+        }
+        #my-video {
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+        }
+        /* Apply the Video.js dark theme class */
+        .video-js.vjs-theme-city {
+             /* You can override specific city theme styles here if needed */
+        }
+         .video-js.vjs-theme-city .vjs-control-bar {
+            background-color: rgba(26, 26, 26, 0.85); /* Darker semi-transparent bar */
+         }
+         .video-js.vjs-theme-city .vjs-play-progress,
+         .video-js.vjs-theme-city .vjs-volume-level {
+            background-color: var(--primary-color); /* Match our primary color */
+         }
+
+
+        #video-info {
+            margin-top: 12px;
+            font-size: 0.9em;
+            color: var(--text-muted);
+            height: 20px;
+            text-align: right;
+        }
+        #loading-indicator, #error-message {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            border: 1px solid transparent;
+        }
+        #loading-indicator {
+            color: var(--warning-text);
+            background-color: var(--warning-bg);
+            border-color: var(--warning-border);
+        }
+        #error-message {
+             color: var(--error-text);
+             background-color: var(--error-bg);
+             border-color: var(--error-border);
+        }
+        /* Custom Scrollbar (Dark) */
+        #channel-list::-webkit-scrollbar {
+            width: 10px;
+        }
+        #channel-list::-webkit-scrollbar-track {
+            background: var(--bg-sidebar); /* Match sidebar background */
+            border-radius: 5px;
+        }
+        #channel-list::-webkit-scrollbar-thumb {
+            background-color: var(--border-input); /* Use input border color */
+            border-radius: 5px;
+            border: 2px solid var(--bg-sidebar); /* Create padding */
+        }
+         #channel-list::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-muted); /* Lighter on hover */
+         }
+    </style>
+</head>
+<body>
+
+    <h1>Local M3U8 IPTV Player</h1>
+
+    <div class="container">
+        <div id="sidebar">
+            <div id="file-input-section">
+                <label for="m3uFile">Select M3U8 File:</label>
+                <input type="file" id="m3uFile" accept=".m3u8,.m3u">
+                <div id="loading-indicator">Parsing file, please wait (this may take a while for large files)...</div>
+                 <div id="error-message"></div>
+            </div>
+
+            <div id="filter-section" style="display: none;">
+                 <label for="channel-filter">Filter Channels:</label>
+                 <input type="text" id="channel-filter" placeholder="Enter channel name...">
+            </div>
+
+            <div id="channel-list">
+                <p style="color: var(--text-muted); text-align: center; margin-top: 20px;">Load an M3U8 file to see channels.</p>
+            </div>
+        </div>
+
+        <div id="player-section">
+            <div id="player-container">
+                <video id="my-video" class="video-js vjs-theme-city" controls preload="auto">
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a web browser that
+                        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                    </p>
+                </video>
+            </div>
+            <div id="video-info">Resolution: N/A | Channel: N/A</div>
+        </div>
+    </div>
+
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+    <script>
+        // --- DOM Element References ---
+        const fileInput = document.getElementById('m3uFile');
+        const channelListDiv = document.getElementById('channel-list');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessageDiv = document.getElementById('error-message');
+        const filterInput = document.getElementById('channel-filter');
+        const filterSection = document.getElementById('filter-section');
+        const videoInfoDiv = document.getElementById('video-info');
+        let videoPlayer = null; // To hold the Video.js player instance
+        let currentChannelName = 'N/A'; // To store the name of the currently playing channel
+        let channelsData = {}; // Structure: { "Category": [{name: "Ch Name", url: "...", element: liElement}, ...], ... }
+
+        // --- Video Player Initialization & Event Handlers ---
+        try {
+            videoPlayer = videojs('my-video', {
+                 fluid: true,
+                 html5: {
+                     hls: {
+                         overrideNative: !videojs.browser.IS_SAFARI
+                     }
+                 }
+                 // Note: The vjs-theme-city class is added directly to the <video> tag now
+            });
+
+            videoPlayer.on('loadedmetadata', () => {
+                updateVideoInfo();
+            });
+            videoPlayer.on('resize', () => {
+                 updateVideoInfo();
+            });
+            videoPlayer.on('error', () => {
+                const error = videoPlayer.error();
+                 console.error('Video Error:', error);
+                 videoInfoDiv.textContent = `Error playing ${currentChannelName}: ${error ? error.message : 'Playback failed'}`;
+                 const playingItem = channelListDiv.querySelector('.channel-item.playing');
+                 if (playingItem) playingItem.classList.remove('playing');
+            });
+        } catch (error) {
+            console.error("Failed to initialize Video.js:", error);
+            errorMessageDiv.textContent = "Failed to initialize video player. Please ensure Video.js is loaded correctly.";
+            errorMessageDiv.style.display = 'block';
+        }
+
+        /** Updates video info display */
+        function updateVideoInfo() {
+            if (!videoPlayer) return;
+            const width = videoPlayer.videoWidth();
+            const height = videoPlayer.videoHeight();
+            const resolution = (width && height) ? `${width}x${height}` : 'N/A';
+            videoInfoDiv.textContent = `Resolution: ${resolution} | Channel: ${currentChannelName}`;
+        }
+
+        // --- File Input Handling ---
+        fileInput.addEventListener('change', handleFileSelect);
+
+        /** Handles file selection, reads file, triggers parsing */
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            channelListDiv.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Loading channels...</p>';
+            filterInput.value = '';
+            filterSection.style.display = 'none';
+            errorMessageDiv.style.display = 'none';
+            errorMessageDiv.textContent = '';
+            loadingIndicator.style.display = 'block';
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                console.log("File read complete. Starting parse...");
+                setTimeout(() => {
+                    try {
+                        channelsData = parseM3U8(e.target.result); // Call the updated parser
+                        console.log(`Parsing complete. Found ${Object.keys(channelsData).length} categories.`);
+                        renderChannelList(channelsData);
+                        filterSection.style.display = 'block';
+                    } catch (error) {
+                         console.error("Error parsing M3U8 file:", error);
+                         errorMessageDiv.textContent = `Error parsing file: ${error.message}. Ensure it's a valid M3U8 file.`;
+                         errorMessageDiv.style.display = 'block';
+                         channelListDiv.innerHTML = `<p style="color: var(--error-text); text-align: center;">Failed to parse file.</p>`;
+                    } finally {
+                         loadingIndicator.style.display = 'none';
+                    }
+                }, 10);
+            };
+
+            reader.onerror = function(e) {
+                 console.error("Error reading file:", e);
+                 loadingIndicator.style.display = 'none';
+                 errorMessageDiv.textContent = 'Error reading the selected file.';
+                 errorMessageDiv.style.display = 'block';
+                 channelListDiv.innerHTML = `<p style="color: var(--error-text); text-align: center;">Failed to read file.</p>`;
+            };
+
+            console.log(`Reading file: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+            reader.readAsText(file);
+        }
+
+        /**
+         * Parses M3U8 content, **skipping VOD entries (.mp4, .mkv, .avi, .flv or containing /movie/, /series/)**.
+         * @param {string} m3u8Content - Raw M3U8 text.
+         * @returns {object} - Structured channel data.
+         */
+        function parseM3U8(m3u8Content) {
+            const lines = m3u8Content.split('\n');
+            const data = {};
+            let currentChannelInfo = null;
+            let skippedVodCount = 0; // Counter for skipped VOD entries
+
+            const extinfRegex = /^#EXTINF:-?\d+(?:\s+([^,]+))?(?:,(.+))?$/;
+            const groupTitleRegex = /group-title="([^"]+)"/;
+
+            console.time("M3U8 Parsing (excluding VOD)");
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                if (line.startsWith('#EXTINF:')) {
+                    const match = line.match(extinfRegex);
+                    let channelName = 'Unknown Channel';
+                    let groupTitle = 'Uncategorized';
+
+                    if (match) {
+                        if (match[2]) channelName = match[2].trim();
+                        if (match[1]) {
+                            const groupMatch = match[1].match(groupTitleRegex);
+                            if (groupMatch && groupMatch[1]) groupTitle = groupMatch[1].trim();
+                        }
+                    }
+                    currentChannelInfo = { name: channelName, group: groupTitle, url: null };
+
+                } else if (currentChannelInfo && (line.startsWith('http://') || line.startsWith('https://'))) {
+                    currentChannelInfo.url = line;
+
+                    // *** VOD Filtering Logic (Enhanced) ***
+                    const lowerUrl = currentChannelInfo.url.toLowerCase();
+                    // Check for VOD file extensions
+                    const isVodExtension = lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.mkv') || lowerUrl.endsWith('.avi') || lowerUrl.endsWith('.flv');
+                    // Check for VOD path segments
+                    const isVodPath = lowerUrl.includes('/movie/') || lowerUrl.includes('/series/');
+
+                    // If it's NOT a VOD extension AND NOT a VOD path, add it
+                    if (!isVodExtension && !isVodPath) {
+                        if (!data[currentChannelInfo.group]) {
+                            data[currentChannelInfo.group] = [];
+                        }
+                        data[currentChannelInfo.group].push({
+                            name: currentChannelInfo.name,
+                            url: currentChannelInfo.url
+                        });
+                    } else {
+                        // It IS VOD (either extension or path matched), skip it
+                        skippedVodCount++;
+                        // console.log(`Skipping VOD: ${currentChannelInfo.name} (${currentChannelInfo.url})`); // Optional: Log skipped VOD
+                    }
+                    currentChannelInfo = null; // Reset for the next entry
+
+                } else if (currentChannelInfo && !line.startsWith('#') && line !== '') {
+                     // Handle non-standard URL line (if not VOD)
+                     currentChannelInfo.url = line;
+                     const lowerUrl = currentChannelInfo.url.toLowerCase();
+                     // Check for VOD file extensions
+                     const isVodExtension = lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.mkv') || lowerUrl.endsWith('.avi') || lowerUrl.endsWith('.flv');
+                     // Check for VOD path segments
+                     const isVodPath = lowerUrl.includes('/movie/') || lowerUrl.includes('/series/');
+
+                     // If it's NOT a VOD extension AND NOT a VOD path, add it
+                     if (!isVodExtension && !isVodPath) {
+                         if (!data[currentChannelInfo.group]) data[currentChannelInfo.group] = [];
+                         data[currentChannelInfo.group].push({ name: currentChannelInfo.name, url: currentChannelInfo.url });
+                     } else {
+                         skippedVodCount++;
+                     }
+                     currentChannelInfo = null;
+                 } else if (line === '' || line.startsWith('#EXT')) {
+                    if (currentChannelInfo && !currentChannelInfo.url) {
+                        currentChannelInfo = null; // Discard incomplete entry
+                    }
+                 }
+            }
+
+            console.timeEnd("M3U8 Parsing (excluding VOD)");
+            if (skippedVodCount > 0) {
+                // Update console log to include all filters
+                console.log(`Skipped ${skippedVodCount} VOD entries (.mp4, .mkv, .avi, .flv or containing /movie/, /series/).`);
+            }
+
+            // Sort the data
+            const sortedData = {};
+            const sortedCategories = Object.keys(data).sort((a, b) => a.localeCompare(b));
+            sortedCategories.forEach(categoryName => {
+                // Filter out empty categories that might result from VOD filtering
+                if (data[categoryName].length > 0) {
+                    const sortedChannels = data[categoryName].sort((a, b) => a.name.localeCompare(b.name));
+                    sortedData[categoryName] = sortedChannels;
+                } else {
+                     console.log(`Category "${categoryName}" removed as it only contained VOD entries.`);
+                }
+            });
+
+            return sortedData;
+        }
+
+        /** Renders the channel list UI */
+        function renderChannelList(data) {
+            channelListDiv.innerHTML = '';
+
+            if (Object.keys(data).length === 0) {
+                 channelListDiv.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No valid (non-VOD) channels found.</p>';
+                 return;
+            }
+
+            Object.keys(data).forEach(categoryName => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.classList.add('category');
+
+                const categoryHeader = document.createElement('div');
+                categoryHeader.classList.add('category-header');
+                categoryHeader.textContent = `${categoryName} (${data[categoryName].length})`;
+                categoryHeader.addEventListener('click', () => {
+                    categoryDiv.classList.toggle('expanded');
+                });
+
+                const channelsUl = document.createElement('ul');
+                channelsUl.classList.add('channels');
+
+                data[categoryName].forEach(channel => {
+                    const channelLi = document.createElement('li');
+                    channelLi.classList.add('channel-item');
+                    channelLi.textContent = channel.name;
+                    channelLi.title = channel.name;
+                    channelLi.dataset.url = channel.url;
+                    channelLi.dataset.name = channel.name;
+                    channel.element = channelLi; // Store reference
+
+                    channelLi.addEventListener('click', () => {
+                        playChannel(channel.url, channel.name, channelLi);
+                    });
+                    channelsUl.appendChild(channelLi);
+                });
+
+                categoryDiv.appendChild(categoryHeader);
+                categoryDiv.appendChild(channelsUl);
+                channelListDiv.appendChild(categoryDiv);
+            });
+        }
+
+        /** Loads and plays the selected channel */
+        function playChannel(url, name, element) {
+            console.log(`Playing: ${name} (${url})`);
+             if (!videoPlayer) {
+                 console.error("Video player is not initialized.");
+                 return;
+             }
+             currentChannelName = name;
+
+            const currentlyPlaying = channelListDiv.querySelector('.channel-item.playing');
+            if (currentlyPlaying) {
+                currentlyPlaying.classList.remove('playing');
+            }
+             if(element) {
+                element.classList.add('playing');
+             }
+             videoInfoDiv.textContent = `Resolution: Loading... | Channel: ${currentChannelName}`;
+
+            try {
+                 videoPlayer.src({ src: url, type: 'application/x-mpegURL' });
+                 videoPlayer.play().catch(error => {
+                     console.error("Error initiating playback:", error);
+                     videoInfoDiv.textContent = `Error starting ${currentChannelName}: ${error.message}`;
+                     if(element) element.classList.remove('playing');
+                 });
+            } catch (error) {
+                console.error("Error setting video source:", error);
+                videoInfoDiv.textContent = `Error loading ${currentChannelName}: ${error.message}`;
+                 if(element) element.classList.remove('playing');
+            }
+        }
+
+        // --- Filtering Logic ---
+         filterInput.addEventListener('input', handleFilter);
+
+         /** Filters the channel list based on input */
+         function handleFilter() {
+            const filterText = filterInput.value.toLowerCase().trim();
+
+            Object.keys(channelsData).forEach(categoryName => {
+                let categoryHasVisibleChannels = false;
+                 const categoryDiv = channelsData[categoryName]?.[0]?.element?.closest('.category');
+                if (!categoryDiv) return;
+
+                channelsData[categoryName].forEach(channel => {
+                     const channelElement = channel.element;
+                    if (!channelElement) return;
+
+                    const channelNameLower = channel.name.toLowerCase();
+                    const isVisible = channelNameLower.includes(filterText);
+                    channelElement.style.display = isVisible ? '' : 'none';
+                    if (isVisible) categoryHasVisibleChannels = true;
+                });
+
+                 categoryDiv.style.display = categoryHasVisibleChannels ? '' : 'none';
+
+                 if (filterText.length > 0) {
+                     if (categoryHasVisibleChannels && !categoryDiv.classList.contains('expanded')) {
+                        categoryDiv.classList.add('expanded');
+                    }
+                 }
+            });
+        }
+
+    </script>
+
+</body>
+</html>
