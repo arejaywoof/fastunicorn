@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M3U8 IPTV Player</title>
-    
-    <!-- Clappr Player -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/clappr/0.4.7/clappr.min.js"></script>
+    <title>Dark IPTV Player</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clappr/0.4.0/clappr.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,1139 +13,724 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .login-form {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 50px auto;
-            backdrop-filter: blur(10px);
-        }
-
-        .login-form h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #667eea;
-            font-size: 2.5em;
-            font-weight: 300;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .file-input {
-            background: rgba(255, 255, 255, 0.9) !important;
-            border: 2px dashed #e0e0e0 !important;
-            padding: 40px 20px !important;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .file-input:hover {
-            border-color: #667eea !important;
-            background: rgba(102, 126, 234, 0.05) !important;
-            transform: translateY(-2px);
-        }
-
-        .progress-container {
-            margin: 20px 0;
-            display: none;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 4px;
-        }
-
-        .progress-text {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .file-size-info {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 14px;
-            color: #555;
-            text-align: center;
-        }
-
-        .connection-form {
-            animation: fadeIn 0.3s ease;
-        }
-
-        #clapprPlayer {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 15px;
-        }
-
-        /* Custom Clappr styling */
-        .clappr-container {
-            border-radius: 15px !important;
-        }
-
-        .media-control-bar {
-            background: rgba(0, 0, 0, 0.8) !important;
-            backdrop-filter: blur(10px);
-        }
-
-        .play-pause-button {
-            color: #667eea !important;
-        }
-
-        .volume-bar .volume-bar-fill {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        }
-
-        .seek-bar .seek-bar-progress {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        }
-
-        .player-interface {
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
+            height: 100vh;
         }
 
-        .header h2 {
-            color: #667eea;
-            font-size: 2em;
-            font-weight: 300;
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: #111;
+            border-right: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
         }
 
-        .logout-btn {
-            padding: 10px 20px;
-            background: #ff6b6b;
+        .sidebar.collapsed {
+            width: 50px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 20px 10px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .sidebar.collapsed .logo {
+            font-size: 16px;
+            writing-mode: vertical-rl;
+        }
+
+        .input-section {
+            padding: 0 20px 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar.collapsed .input-section {
+            display: none;
+        }
+
+        .input-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: #222;
+            border: 1px solid #333;
+            color: #aaa;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: #222;
+            border: 2px dashed #444;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-input-label:hover {
+            border-color: #6366f1;
+            background: #2a2a2a;
+        }
+
+        .api-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .api-inputs input {
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .api-inputs input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .connect-btn {
+            padding: 12px;
+            background: #6366f1;
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 16px;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: background 0.3s;
         }
 
-        .logout-btn:hover {
-            background: #ff5252;
-            transform: translateY(-1px);
+        .connect-btn:hover {
+            background: #5558d9;
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 30px;
-            min-height: 600px;
+        .connect-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
         }
 
-        .sidebar {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
-            padding: 20px;
-            height: fit-content;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        /* Tree View */
+        .channels-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
         }
 
-        .sidebar h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            font-weight: 500;
+        .sidebar.collapsed .channels-tree {
+            display: none;
         }
 
-        .category-list {
-            list-style: none;
+        .category {
+            margin-bottom: 5px;
         }
 
-        .category-item {
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 10px;
+        .category-header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .category-header:hover {
+            background: #222;
+        }
+
+        .category-toggle {
+            margin-right: 8px;
+            transition: transform 0.2s;
+        }
+
+        .category.expanded .category-toggle {
+            transform: rotate(90deg);
+        }
+
+        .category-name {
+            flex: 1;
             font-weight: 500;
         }
 
-        .category-item:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(5px);
+        .category-count {
+            font-size: 12px;
+            color: #666;
+            background: #222;
+            padding: 2px 8px;
+            border-radius: 12px;
         }
 
-        .category-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .channels-list {
+            display: none;
+            margin-left: 20px;
+            margin-top: 5px;
         }
 
-        .content-area {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        .category.expanded .channels-list {
+            display: block;
         }
 
-        .video-container {
-            width: 100%;
-            height: 450px;
-            background: #000;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            overflow: hidden;
-            position: relative;
+        .channel-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 2px;
         }
 
-        #clapprPlayer {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 15px;
+        .channel-item:hover {
+            background: #222;
         }
 
-        /* Custom Clappr styling */
-        .clappr-container {
-            border-radius: 15px !important;
+        .channel-item.active {
+            background: #6366f1;
         }
 
-        .media-control-bar {
-            background: rgba(0, 0, 0, 0.8) !important;
-            backdrop-filter: blur(10px);
-        }
-
-        .play-pause-button {
-            color: #667eea !important;
-        }
-
-        .volume-bar .volume-bar-fill {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        }
-
-        .seek-bar .seek-bar-progress {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        }
-
-        .video-placeholder {
+        .channel-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 4px;
+            background: #333;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            font-size: 12px;
             color: #666;
-            font-size: 1.2em;
-            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
-                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
 
-        .channels-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .channel-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .channel-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            border-color: #667eea;
-        }
-
-        .channel-card.playing {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        .channel-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         .channel-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 1.1em;
+            flex: 1;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .channel-info {
-            color: #666;
-            font-size: 0.9em;
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a0a;
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #667eea;
-            font-size: 1.2em;
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #111;
+            border-bottom: 1px solid #222;
         }
 
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #c62828;
+        .toggle-sidebar {
+            padding: 8px 12px;
+            background: #222;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
         }
 
-        .success {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #2e7d32;
+        .toggle-sidebar:hover {
+            background: #333;
         }
 
-        .search-box {
+        .now-playing {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .player-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #player {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.9);
+            height: 100%;
+            max-width: 1200px;
+            max-height: 675px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
-        .search-box:focus {
-            outline: none;
-            border-color: #667eea;
+        .empty-state {
+            text-align: center;
+            color: #666;
         }
 
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                order: 2;
-            }
-            
-            .content-area {
-                order: 1;
-            }
-            
-            .channels-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
         }
 
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            background: #1a1a1a;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
+            background: #444;
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            background: #555;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 100;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Login Form -->
-        <div id="loginForm" class="login-form">
-            <h1>M3U8 IPTV Player</h1>
-            <div id="message"></div>
-            
-            <!-- M3U8 Playlist Form -->
-            <form id="m3uForm" class="connection-form">
-                <div class="form-group">
-                    <label for="playlistUrl">M3U8 Playlist URL:</label>
-                    <input type="url" id="playlistUrl" placeholder="http://your-server.com/playlist.m3u8">
-                </div>
-                <div class="form-group">
-                    <label for="playlistFile">Or Upload M3U8 File:</label>
-                    <input type="file" id="playlistFile" accept=".m3u8,.m3u,.txt" class="file-input">
-                    <div class="file-help">Drag & drop your M3U8 file here or click to browse</div>
-                    <div id="fileSizeInfo" class="file-size-info" style="display: none;"></div>
-                </div>
-                
-                <!-- Progress Bar -->
-                <div id="progressContainer" class="progress-container">
-                    <div class="progress-bar">
-                        <div id="progressFill" class="progress-fill"></div>
-                    </div>
-                    <div id="progressText" class="progress-text">Preparing to load...</div>
-                </div>
-                
-                <button type="submit" class="btn" id="m3uBtn">Load Playlist</button>
-            </form>
-        </div>
-
-        <!-- Player Interface -->
-        <div id="playerInterface" class="player-interface">
-            <div class="header">
-                <h2>IPTV Player</h2>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">IPTV Player</div>
             </div>
             
-            <div class="main-content">
-                <div class="tree-sidebar">
-                    <h3>📺 Channels</h3>
-                    <input type="text" class="search-box" id="searchBox" placeholder="Search channels...">
-                    <ul id="categoryTree" class="category-tree"></ul>
+            <div class="input-section">
+                <div class="input-tabs">
+                    <button class="tab-btn active" onclick="switchTab('file')">M3U File</button>
+                    <button class="tab-btn" onclick="switchTab('api')">Xtream API</button>
                 </div>
                 
-                <div class="video-area">
-                    <div id="nowPlaying" class="now-playing" style="display: none;">
-                        <h4>Now Playing</h4>
-                        <p class="channel-title" id="currentChannelName">Select a channel to start watching</p>
+                <div id="file-tab" class="tab-content active">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="m3u-file" accept=".m3u,.m3u8">
+                        <label for="m3u-file" class="file-input-label">
+                            📁 Choose M3U/M3U8 File
+                        </label>
                     </div>
-                    
-                    <div class="video-container">
-                        <div id="videoPlaceholder" class="video-placeholder">
-                            Select a channel from the tree to start watching
-                        </div>
-                        <div id="clapprPlayer" style="display: none;"></div>
+                </div>
+                
+                <div id="api-tab" class="tab-content">
+                    <div class="api-inputs">
+                        <input type="text" id="api-url" placeholder="Server URL">
+                        <input type="text" id="api-username" placeholder="Username">
+                        <input type="password" id="api-password" placeholder="Password">
+                        <button class="connect-btn" onclick="connectXtreamAPI()">Connect</button>
                     </div>
                 </div>
             </div>
-        </div>
+            
+            <div class="channels-tree" id="channels-tree">
+                <div class="empty-state">
+                    <p>Load an M3U file or connect to Xtream API to view channels</p>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="player-header">
+                <button class="toggle-sidebar" onclick="toggleSidebar()">☰ Menu</button>
+                <div class="now-playing" id="now-playing">No channel selected</div>
+                <div></div>
+            </header>
+            
+            <div class="player-wrapper">
+                <div id="player">
+                    <div class="empty-state">
+                        <h2>Welcome to IPTV Player</h2>
+                        <p>Select a channel from the sidebar to start watching</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px;">Loading...</p>
     </div>
 
     <script>
-        let categories = [];
+        let player = null;
         let channels = [];
-        let currentChannel = null;
-        let filteredChannels = [];
-        let player = null; // Clappr player instance
-        let expandedCategories = new Set(); // Track which categories are expanded
+        let categories = {};
+        let activeChannel = null;
 
-        // File size display
-        document.getElementById('playlistFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const sizeInfo = document.getElementById('fileSizeInfo');
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                sizeInfo.textContent = `File size: ${sizeMB} MB`;
-                sizeInfo.style.display = 'block';
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'file') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                document.getElementById('file-tab').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                document.getElementById('api-tab').classList.add('active');
+            }
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            
+            // Mobile handling
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('mobile-open');
+            }
+        }
+
+        // M3U Parser
+        function parseM3U(content) {
+            const lines = content.split('\n');
+            const parsedChannels = [];
+            let currentChannel = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
                 
-                if (file.size > 100 * 1024 * 1024) { // > 100MB
-                    sizeInfo.innerHTML += ' <br><strong>Large file detected - optimized loading will be used</strong>';
-                    sizeInfo.style.background = 'rgba(255, 193, 7, 0.1)';
-                    sizeInfo.style.color = '#856404';
+                if (line.startsWith('#EXTINF:')) {
+                    const nameMatch = line.match(/,(.+)$/);
+                    const groupMatch = line.match(/group-title="([^"]+)"/);
+                    const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+                    
+                    currentChannel = {
+                        name: nameMatch ? nameMatch[1].trim() : 'Unknown',
+                        group: groupMatch ? groupMatch[1] : 'Uncategorized',
+                        logo: logoMatch ? logoMatch[1] : null,
+                        url: null
+                    };
+                } else if (line && !line.startsWith('#') && currentChannel) {
+                    currentChannel.url = line;
+                    parsedChannels.push(currentChannel);
+                    currentChannel = null;
                 }
             }
-        });
 
-        // M3U8 Playlist Loading with Progress
-        document.getElementById('m3uForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const playlistUrl = document.getElementById('playlistUrl').value.trim();
-            const playlistFile = document.getElementById('playlistFile').files[0];
-            
-            if (!playlistUrl && !playlistFile) {
-                showMessage('Please provide a playlist URL or upload a file', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('m3uBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span>Loading...';
-            
-            showProgress(true);
+            return parsedChannels;
+        }
+
+        // File input handler
+        document.getElementById('m3u-file').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            showLoading(true);
             
             try {
-                let playlistContent = '';
-                
-                if (playlistFile) {
-                    updateProgress(0, `Loading file: ${playlistFile.name}`);
-                    playlistContent = await readFileWithProgress(playlistFile);
-                } else {
-                    updateProgress(0, 'Downloading playlist...');
-                    playlistContent = await fetchWithProgress(playlistUrl);
-                }
-                
-                updateProgress(70, 'Parsing playlist...');
-                await parseM3U8PlaylistOptimized(playlistContent);
-                
-                updateProgress(100, 'Complete!');
-                showMessage(`Playlist loaded! Found ${channels.length} channels in ${categories.length} categories.`, 'success');
-                
-                setTimeout(() => {
-                    showPlayerInterface();
-                    showProgress(false);
-                }, 1000);
-                
+                const content = await file.text();
+                channels = parseM3U(content);
+                organizeChannels();
+                renderChannels();
+                showLoading(false);
             } catch (error) {
-                showMessage(`Failed to load playlist: ${error.message}`, 'error');
-                showProgress(false);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Load Playlist';
+                console.error('Error parsing M3U file:', error);
+                alert('Error parsing M3U file. Please check the file format.');
+                showLoading(false);
             }
         });
 
-        // Drag and drop functionality
-        const fileInput = document.getElementById('playlistFile');
-        const form = document.getElementById('m3uForm');
+        // Xtream API Connection
+        async function connectXtreamAPI() {
+            const url = document.getElementById('api-url').value.trim();
+            const username = document.getElementById('api-username').value.trim();
+            const password = document.getElementById('api-password').value.trim();
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            form.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            form.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            form.addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight() {
-            fileInput.style.borderColor = '#667eea';
-            fileInput.style.background = 'rgba(102, 126, 234, 0.1)';
-        }
-
-        function unhighlight() {
-            fileInput.style.borderColor = '#e0e0e0';
-            fileInput.style.background = 'rgba(255, 255, 255, 0.9)';
-        }
-
-        form.addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            
-            if (files.length > 0) {
-                const file = files[0];
-                document.getElementById('playlistFile').files = files;
-                
-                const sizeInfo = document.getElementById('fileSizeInfo');
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                sizeInfo.textContent = `File ready: ${file.name} (${sizeMB} MB)`;
-                sizeInfo.style.display = 'block';
-                
-                if (file.size > 100 * 1024 * 1024) { // > 100MB
-                    sizeInfo.innerHTML += ' <br><strong>Large file - optimized loading will be used</strong>';
-                    sizeInfo.style.background = 'rgba(255, 193, 7, 0.1)';
-                    sizeInfo.style.color = '#856404';
-                }
-                
-                showMessage(`File ready: ${file.name}`, 'success');
-            }
-        }
-
-        // Progress bar functions
-        function showProgress(show) {
-            document.getElementById('progressContainer').style.display = show ? 'block' : 'none';
-            if (!show) {
-                updateProgress(0, '');
-            }
-        }
-
-        function updateProgress(percent, text) {
-            document.getElementById('progressFill').style.width = percent + '%';
-            document.getElementById('progressText').textContent = text;
-        }
-
-        // Optimized file reading with progress
-        function readFileWithProgress(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onprogress = (e) => {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 60); // Up to 60% for reading
-                        updateProgress(percent, `Reading file: ${percent}%`);
-                    }
-                };
-                
-                reader.onload = (e) => {
-                    updateProgress(60, 'File loaded, preparing to parse...');
-                    resolve(e.target.result);
-                };
-                
-                reader.onerror = () => reject(new Error('Failed to read file'));
-                reader.readAsText(file);
-            });
-        }
-
-        // Fetch with progress tracking
-        async function fetchWithProgress(url) {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Failed to fetch playlist');
-            
-            const contentLength = response.headers.get('content-length');
-            if (!contentLength) {
-                // If no content-length, just read normally
-                updateProgress(30, 'Downloading playlist...');
-                const text = await response.text();
-                updateProgress(60, 'Download complete');
-                return text;
-            }
-            
-            const total = parseInt(contentLength, 10);
-            const reader = response.body.getReader();
-            const chunks = [];
-            let loaded = 0;
-            
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                
-                chunks.push(value);
-                loaded += value.length;
-                
-                const percent = Math.round((loaded / total) * 60); // Up to 60% for download
-                updateProgress(percent, `Downloading: ${(loaded / 1024 / 1024).toFixed(1)}MB / ${(total / 1024 / 1024).toFixed(1)}MB`);
-            }
-            
-            // Convert chunks to text
-            const allChunks = new Uint8Array(loaded);
-            let position = 0;
-            for (const chunk of chunks) {
-                allChunks.set(chunk, position);
-                position += chunk.length;
-            }
-            
-            updateProgress(60, 'Processing download...');
-            return new TextDecoder().decode(allChunks);
-        }
-
-        // Optimized M3U8 parsing with chunked processing
-        async function parseM3U8PlaylistOptimized(content) {
-            const lines = content.split('\n');
-            const totalLines = lines.length;
-            const parsedChannels = [];
-            const parsedCategories = new Set();
-            
-            let currentChannel = null;
-            const chunkSize = 1000; // Process 1000 lines at a time
-            let processedLines = 0;
-            
-            // Process in chunks to avoid blocking the UI
-            for (let startIndex = 0; startIndex < totalLines; startIndex += chunkSize) {
-                const endIndex = Math.min(startIndex + chunkSize, totalLines);
-                const chunk = lines.slice(startIndex, endIndex);
-                
-                // Process this chunk
-                for (let i = 0; i < chunk.length; i++) {
-                    const line = chunk[i].trim();
-                    
-                    if (line.startsWith('#EXTINF:')) {
-                        // Parse channel info
-                        const info = line.substring(8); // Remove '#EXTINF:'
-                        const parts = info.split(',');
-                        
-                        if (parts.length >= 2) {
-                            const name = parts.slice(1).join(',').trim();
-                            
-                            // Extract additional info from attributes
-                            let category = 'Uncategorized';
-                            let logo = '';
-                            
-                            // Parse group-title and tvg-logo more efficiently
-                            const groupMatch = line.match(/group-title="([^"]*)"/);
-                            const logoMatch = line.match(/tvg-logo="([^"]*)"/);
-                            
-                            if (groupMatch) category = groupMatch[1];
-                            if (logoMatch) logo = logoMatch[1];
-                            
-                            currentChannel = {
-                                name: name,
-                                category_name: category,
-                                logo: logo,
-                                stream_id: parsedChannels.length + 1,
-                                stream_type: 'live'
-                            };
-                            
-                            parsedCategories.add(category);
-                        }
-                    } else if (line && !line.startsWith('#') && currentChannel) {
-                        // This should be the stream URL
-                        currentChannel.stream_url = line;
-                        parsedChannels.push(currentChannel);
-                        currentChannel = null;
-                    }
-                }
-                
-                processedLines += chunk.length;
-                const percent = 70 + Math.round((processedLines / totalLines) * 25); // 70-95%
-                updateProgress(percent, `Parsing: ${processedLines}/${totalLines} lines (${parsedChannels.length} channels found)`);
-                
-                // Allow UI to update
-                await new Promise(resolve => setTimeout(resolve, 1));
-            }
-            
-            updateProgress(95, 'Organizing channels...');
-            
-            // Convert categories to the expected format
-            categories = Array.from(parsedCategories).map((cat, index) => ({
-                category_id: index + 1,
-                category_name: cat
-            }));
-            
-            channels = parsedChannels;
-            filteredChannels = [...channels];
-            
-            updateProgress(98, 'Preparing interface...');
-            
-            // Use setTimeout to allow progress update to render
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            renderCategories();
-            renderChannels();
-        }
-
-        async function authenticate() {
-            // This function is no longer needed - removed XStreamCodes functionality
-        }
-
-        async function loadCategories() {
-            // Categories are now loaded directly from M3U8 parsing
-            renderCategories();
-            await loadChannels();
-        }
-
-        async function loadChannels() {
-            // For M3U8 playlists, channels are already loaded from parsing
-            // Just need to render the tree
-            renderCategoryTree();
-        }
-
-        function renderCategoryTree() {
-            const categoryTree = document.getElementById('categoryTree');
-            categoryTree.innerHTML = '';
-            
-            if (categories.length === 0) {
-                categoryTree.innerHTML = '<li style="padding: 20px; text-align: center; color: #666;">No categories found</li>';
+            if (!url || !username || !password) {
+                alert('Please fill in all fields');
                 return;
             }
-            
-            categories.forEach(category => {
-                const categoryChannels = channels.filter(channel => 
-                    channel.category_name === category.category_name
-                );
-                
-                if (categoryChannels.length === 0) return;
-                
-                const categoryNode = document.createElement('li');
-                categoryNode.className = 'category-node';
-                
-                const isExpanded = expandedCategories.has(category.category_id);
-                
-                categoryNode.innerHTML = `
-                    <div class="category-header ${isExpanded ? 'expanded' : ''}" onclick="toggleCategory(${category.category_id})">
-                        <div class="category-icon"></div>
-                        <span class="category-name">${category.category_name}</span>
-                        <span class="channel-count">${categoryChannels.length}</span>
-                    </div>
-                    <ul class="channels-list ${isExpanded ? 'expanded' : ''}" id="channels-${category.category_id}">
-                        ${categoryChannels.map(channel => `
-                            <li class="channel-item" onclick="playChannelFromTree(${channel.stream_id})">
-                                <div class="channel-name-tree">${channel.name}</div>
-                            </li>
-                        `).join('')}
-                    </ul>
-                `;
-                
-                categoryTree.appendChild(categoryNode);
+
+            showLoading(true);
+
+            try {
+                // Get live categories
+                const categoriesUrl = `${url}/player_api.php?username=${username}&password=${password}&action=get_live_categories`;
+                const categoriesResponse = await fetch(categoriesUrl);
+                const categoriesData = await categoriesResponse.json();
+
+                // Get live streams
+                const streamsUrl = `${url}/player_api.php?username=${username}&password=${password}&action=get_live_streams`;
+                const streamsResponse = await fetch(streamsUrl);
+                const streamsData = await streamsResponse.json();
+
+                // Convert to our format
+                channels = streamsData.map(stream => ({
+                    name: stream.name,
+                    group: getCategoryName(stream.category_id, categoriesData),
+                    logo: stream.stream_icon,
+                    url: `${url}/live/${username}/${password}/${stream.stream_id}.m3u8`
+                }));
+
+                organizeChannels();
+                renderChannels();
+                showLoading(false);
+            } catch (error) {
+                console.error('Error connecting to Xtream API:', error);
+                alert('Error connecting to Xtream API. Please check your credentials and server URL.');
+                showLoading(false);
+            }
+        }
+
+        function getCategoryName(categoryId, categories) {
+            const category = categories.find(cat => cat.category_id === categoryId);
+            return category ? category.category_name : 'Uncategorized';
+        }
+
+        function organizeChannels() {
+            categories = {};
+            channels.forEach(channel => {
+                if (!categories[channel.group]) {
+                    categories[channel.group] = [];
+                }
+                categories[channel.group].push(channel);
             });
-        }
-
-        function toggleCategory(categoryId) {
-            const header = document.querySelector(`[onclick="toggleCategory(${categoryId})"]`);
-            const channelsList = document.getElementById(`channels-${categoryId}`);
-            
-            if (expandedCategories.has(categoryId)) {
-                // Collapse
-                expandedCategories.delete(categoryId);
-                header.classList.remove('expanded');
-                channelsList.classList.remove('expanded');
-            } else {
-                // Expand
-                expandedCategories.add(categoryId);
-                header.classList.add('expanded');
-                channelsList.classList.add('expanded');
-            }
-        }
-
-        function playChannelFromTree(streamId) {
-            const channel = channels.find(ch => ch.stream_id === streamId);
-            if (channel) {
-                // Update tree UI
-                document.querySelectorAll('.channel-item').forEach(item => {
-                    item.classList.remove('playing');
-                });
-                event.currentTarget.classList.add('playing');
-                
-                // Update now playing info
-                document.getElementById('nowPlaying').style.display = 'block';
-                document.getElementById('currentChannelName').textContent = channel.name;
-                
-                // Play the channel
-                playChannelWithClappr(channel);
-            }
-        }
-
-        function renderCategories() {
-            // Categories are now rendered as part of the tree
-            renderCategoryTree();
         }
 
         function renderChannels() {
-            // Channels are now rendered as part of the tree
-            // This function is kept for compatibility but does nothing
+            const tree = document.getElementById('channels-tree');
+            tree.innerHTML = '';
+
+            Object.entries(categories).forEach(([categoryName, categoryChannels]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'category-header';
+                categoryHeader.onclick = () => toggleCategory(categoryDiv);
+                
+                categoryHeader.innerHTML = `
+                    <span class="category-toggle">▶</span>
+                    <span class="category-name">${categoryName}</span>
+                    <span class="category-count">${categoryChannels.length}</span>
+                `;
+                
+                const channelsList = document.createElement('div');
+                channelsList.className = 'channels-list';
+                
+                categoryChannels.forEach(channel => {
+                    const channelItem = document.createElement('div');
+                    channelItem.className = 'channel-item';
+                    channelItem.onclick = () => playChannel(channel);
+                    
+                    const icon = channel.logo 
+                        ? `<img src="${channel.logo}" alt="${channel.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='📺';">`
+                        : '📺';
+                    
+                    channelItem.innerHTML = `
+                        <div class="channel-icon">${icon}</div>
+                        <div class="channel-name">${channel.name}</div>
+                    `;
+                    
+                    channelsList.appendChild(channelItem);
+                });
+                
+                categoryDiv.appendChild(categoryHeader);
+                categoryDiv.appendChild(channelsList);
+                tree.appendChild(categoryDiv);
+            });
         }
 
-        async function selectCategory(categoryId, element) {
-            // This function is no longer needed with the tree UI
-            // Categories are toggled with toggleCategory instead
+        function toggleCategory(categoryDiv) {
+            categoryDiv.classList.toggle('expanded');
         }
 
-        function playChannelWithClappr(channel) {
-            // Use the stream URL from the M3U8 playlist
-            const streamUrl = channel.stream_url;
+        function playChannel(channel) {
+            if (!channel.url) return;
+
+            activeChannel = channel;
             
-            // Show player and hide placeholder
-            showPlayer();
+            // Update active state
+            document.querySelectorAll('.channel-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
             
-            // Destroy existing player if it exists
+            // Update now playing
+            document.getElementById('now-playing').textContent = channel.name;
+            
+            // Initialize or update player
+            const playerElement = document.getElementById('player');
+            
             if (player) {
                 player.destroy();
-                player = null;
             }
             
-            // Create new Clappr player
             player = new Clappr.Player({
-                source: streamUrl,
-                parentId: '#clapprPlayer',
+                source: channel.url,
+                parentId: '#player',
                 width: '100%',
                 height: '100%',
                 autoPlay: true,
-                mute: false,
-                controls: true,
-                chromeless: false,
-                hideMediaControl: false,
-                mediacontrol: {
-                    seekbar: "#667eea",
-                    buttons: "#667eea"
-                },
                 playback: {
                     hlsjsConfig: {
                         enableWorker: true,
-                        lowLatencyMode: false,
-                        backBufferLength: 90,
                         maxBufferLength: 30,
-                        maxMaxBufferLength: 600,
-                        maxBufferSize: 60 * 1000 * 1000,
-                        maxBufferHole: 0.5
+                        maxMaxBufferLength: 600
                     }
+                },
+                chromecast: {
+                    appId: '9DFB77C0',
+                    contentType: 'video/mp4',
+                },
+                plugins: [Clappr.MediaControl],
+                mediacontrol: {
+                    seekbar: "#6366f1",
+                    buttons: "#FFF"
                 }
             });
             
-            // Event handlers
-            player.on(Clappr.Events.PLAYER_READY, function() {
-                console.log('Clappr: Player ready for', channel.name);
+            player.on(Clappr.Events.PLAYER_ERROR, (error) => {
+                console.error('Player error:', error);
+                alert('Error playing stream. The stream might be unavailable.');
             });
-            
-            player.on(Clappr.Events.PLAYER_PLAY, function() {
-                console.log('Clappr: Playing', channel.name);
-            });
-            
-            player.on(Clappr.Events.PLAYER_ERROR, function(error) {
-                console.error('Clappr error:', error);
-                showMessage(`Playback error: ${error.message || 'Stream cannot be played'}`, 'error');
-                hidePlayer();
-                document.getElementById('nowPlaying').style.display = 'none';
-            });
-            
-            player.on(Clappr.Events.CORE_PLAYBACK_ERROR, function(error) {
-                console.error('Clappr playback error:', error);
-                
-                let errorMessage = 'Stream playback failed';
-                if (error && error.raw) {
-                    if (error.raw.type === 'networkError') {
-                        errorMessage = 'Network error: Cannot connect to stream';
-                    } else if (error.raw.type === 'mediaError') {
-                        errorMessage = 'Media error: Stream format issue';
-                    } else if (error.raw.fatal) {
-                        errorMessage = 'Fatal error: Stream cannot be played';
-                    }
-                }
-                
-                showMessage(errorMessage, 'error');
-                document.getElementById('nowPlaying').style.display = 'none';
-            });
-            
-            console.log('Loading stream with Clappr:', streamUrl);
-            currentChannel = channel;
-        }:', streamUrl);
-            currentChannel = channel;
-        }:', streamUrl);
-            currentChannel = channel;
         }
 
-        // Search functionality with tree support
-        document.getElementById('searchBox').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            
-            if (searchTerm === '') {
-                // Show all categories and channels
-                renderCategoryTree();
-                return;
-            }
-            
-            // Filter categories and channels based on search
-            const categoryTree = document.getElementById('categoryTree');
-            categoryTree.innerHTML = '';
-            
-            let hasResults = false;
-            
-            categories.forEach(category => {
-                const categoryChannels = channels.filter(channel => 
-                    channel.category_name === category.category_name &&
-                    (channel.name.toLowerCase().includes(searchTerm) ||
-                     category.category_name.toLowerCase().includes(searchTerm))
-                );
-                
-                if (categoryChannels.length === 0) return;
-                
-                hasResults = true;
-                const categoryNode = document.createElement('li');
-                categoryNode.className = 'category-node';
-                
-                // Auto-expand categories with search results
-                categoryNode.innerHTML = `
-                    <div class="category-header expanded" onclick="toggleCategory(${category.category_id})">
-                        <div class="category-icon"></div>
-                        <span class="category-name">${category.category_name}</span>
-                        <span class="channel-count">${categoryChannels.length}</span>
-                    </div>
-                    <ul class="channels-list expanded" id="channels-${category.category_id}">
-                        ${categoryChannels.map(channel => {
-                            // Highlight search term in channel name
-                            const highlightedName = channel.name.replace(
-                                new RegExp(searchTerm, 'gi'),
-                                match => `<mark style="background: #667eea; color: white; padding: 2px 4px; border-radius: 3px;">${match}</mark>`
-                            );
-                            return `
-                                <li class="channel-item" onclick="playChannelFromTree(${channel.stream_id})">
-                                    <div class="channel-name-tree">${highlightedName}</div>
-                                </li>
-                            `;
-                        }).join('')}
-                    </ul>
-                `;
-                
-                categoryTree.appendChild(categoryNode);
-            });
-            
-            if (!hasResults) {
-                categoryTree.innerHTML = '<li style="padding: 20px; text-align: center; color: #666;">No channels found matching your search</li>';
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('active', show);
+        }
+
+        // Mobile responsiveness
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
             }
         });
 
-        function showPlayerInterface() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('playerInterface').style.display = 'block';
-            
-            // Clappr will be initialized when a channel is played
-        }
-
-        function hidePlayer() {
-            if (player) {
-                player.stop();
-            }
-            document.getElementById('clapprPlayer').style.display = 'none';
-            document.getElementById('videoPlaceholder').style.display = 'flex';
-        }
-
-        function showPlayer() {
-            document.getElementById('clapprPlayer').style.display = 'block';
-            document.getElementById('videoPlaceholder').style.display = 'none';
-        }
-
-        function logout() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('playerInterface').style.display = 'none';
-            
-            // Reset form
-            document.getElementById('m3uForm').reset();
-            document.getElementById('message').innerHTML = '';
-            document.getElementById('fileSizeInfo').style.display = 'none';
-            
-            // Reset button
-            document.getElementById('m3uBtn').disabled = false;
-            document.getElementById('m3uBtn').textContent = 'Load Playlist';
-            
-            // Hide progress
-            showProgress(false);
-            
-            // Reset Clappr player
-            if (player) {
-                player.destroy();
-                player = null;
-            }
-            hidePlayer();
-            document.getElementById('videoPlaceholder').textContent = 'Select a channel from the tree to start watching';
-            document.getElementById('nowPlaying').style.display = 'none';
-            
-            // Clear data
-            categories = [];
-            channels = [];
-            currentChannel = null;
-            filteredChannels = [];
-            expandedCategories.clear();
-        }
-
-        function showMessage(message, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
-            
-            // Auto-hide success messages
-            if (type === 'success') {
-                setTimeout(() => {
-                    messageDiv.innerHTML = '';
-                }, 3000);
-            }
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && currentChannel) {
-                const videoPlayer = document.getElementById('videoPlayer');
-                if (videoPlayer.requestFullscreen) {
-                    document.exitFullscreen();
+        // Close sidebar on mobile when clicking outside
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const toggleBtn = document.querySelector('.toggle-sidebar');
+                
+                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
                 }
             }
         });
-
-        // Initialize
-        console.log('M3U8 IPTV Player with Clappr initialized - Ready to load playlists!');
     </script>
 </body>
 </html>
