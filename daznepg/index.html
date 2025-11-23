@@ -1373,7 +1373,7 @@
       const formattedDate = dateObj.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
       // Update the header
-      document.querySelector('.analytics-header h2').innerHTML = `Analytics for DAZN<br><span style="font-size: 0.6em; opacity: 0.8;">${formattedDate} in ${countryName}</span>`;
+      document.querySelector('.analytics-header h2').textContent = `DAZN Schedule Analytics for ${countryName} on ${formattedDate}`;
 
       document.getElementById('analyticsModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
