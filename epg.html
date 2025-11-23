@@ -668,6 +668,79 @@
       font-size: 0.85rem;
     }
 
+    /* Heatmap Styles */
+    .heatmap-container {
+      display: grid;
+      grid-template-columns: 60px repeat(24, 1fr);
+      gap: 2px;
+      margin-top: 10px;
+    }
+
+    .heatmap-row {
+      display: contents;
+    }
+
+    .heatmap-label {
+      font-size: 0.75rem;
+      color: #888;
+      display: flex;
+      align-items: center;
+      padding-right: 8px;
+    }
+
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 3px;
+      min-height: 20px;
+      transition: transform 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .heatmap-cell:hover {
+      transform: scale(1.2);
+      z-index: 10;
+    }
+
+    .heatmap-cell[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 100;
+    }
+
+    .heatmap-header {
+      font-size: 0.65rem;
+      color: #666;
+      text-align: center;
+      padding-bottom: 4px;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .heatmap-gradient {
+      width: 120px;
+      height: 12px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #1e1e2e, #3b1d5c, #7c3aed, #00d4ff);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header h1 {
@@ -815,6 +888,28 @@
           <div class="chart-wrapper">
             <canvas id="competitionsChart"></canvas>
           </div>
+        </div>
+        <div class="chart-card">
+          <h3>Subscription vs PPV</h3>
+          <div class="chart-wrapper">
+            <canvas id="accessChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Video Quality Features</h3>
+          <div class="chart-wrapper">
+            <canvas id="qualityChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-bottom: 20px;">
+        <h3>Events by Time of Day</h3>
+        <div class="heatmap-container" id="timeHeatmap"></div>
+        <div class="heatmap-legend">
+          <span>Less</span>
+          <div class="heatmap-gradient"></div>
+          <span>More</span>
         </div>
       </div>
 
@@ -1169,13 +1264,59 @@
         !e.Competition?.Title?.toLowerCase().includes('live tv')
       );
 
-      // Helper to parse date strings properly
-      function parseEventDate(dateStr) {
-        if (!dateStr) return null;
-        // Handle ISO format or other formats
-        const d = new Date(dateStr);
-        if (!isNaN(d.getTime())) return d;
-        return null;
+      // Estimated duration by sport (in minutes) for events without end times
+      const sportDurations = {
+        'soccer': 120,
+        'football': 180,
+        'basketball': 150,
+        'baseball': 180,
+        'hockey': 150,
+        'tennis': 120,
+        'golf': 240,
+        'boxing': 180,
+        'mma': 180,
+        'ufc': 180,
+        'wrestling': 150,
+        'cricket': 240,
+        'rugby': 120,
+        'motorsport': 150,
+        'racing': 150,
+        'cycling': 180,
+        'default': 120
+      };
+
+      function getEstimatedDuration(sportTitle) {
+        if (!sportTitle) return sportDurations.default;
+        const sport = sportTitle.toLowerCase();
+        for (const [key, duration] of Object.entries(sportDurations)) {
+          if (sport.includes(key)) return duration;
+        }
+        return sportDurations.default;
+      }
+
+      // Helper to calculate duration in minutes
+      function getEventDuration(event) {
+        try {
+          // First try actual end time
+          if (event.End) {
+            const start = new Date(event.Start).getTime();
+            const end = new Date(event.End).getTime();
+            if (!isNaN(start) && !isNaN(end) && end > start) {
+              return (end - start) / (1000 * 60);
+            }
+          }
+
+          // Try DurationInMillis
+          if (event.DurationInMillis && event.DurationInMillis > 0) {
+            return event.DurationInMillis / (1000 * 60);
+          }
+
+          // Fall back to estimated duration based on sport
+          return getEstimatedDuration(event.Sport?.Title);
+        } catch (e) {
+          console.error('Duration calc error:', e);
+        }
+        return sportDurations.default;
       }
 
       // Calculate stats
@@ -1186,23 +1327,58 @@
       const sportBroadcastHours = {};
       let totalMinutes = 0;
 
+      // New analytics data
+      let freeCount = 0;
+      let paidCount = 0;
+      let geoRestrictedCount = 0;
+      let has4k = 0;
+      let hasHdr = 0;
+      let hasMultiView = 0;
+      let hasDownload = 0;
+      const timeOfDayData = {
+        'Early Morning (12am-6am)': new Array(24).fill(0),
+        'Morning (6am-12pm)': new Array(24).fill(0),
+        'Afternoon (12pm-6pm)': new Array(24).fill(0),
+        'Evening (6pm-12am)': new Array(24).fill(0)
+      };
+      const sportByHour = {};
+
       events.forEach(event => {
         const sport = event.Sport?.Title || 'Other';
         const competition = event.Competition?.Title || 'Unknown';
-        const startDate = parseEventDate(event.Start);
-        const endDate = parseEventDate(event.End);
-        const startHour = startDate ? startDate.getHours() : 0;
-
-        let duration = 0;
-        if (startDate && endDate && endDate > startDate) {
-          duration = (endDate - startDate) / (1000 * 60);
-        }
+        const startHour = new Date(event.Start).getHours() || 0;
+        const duration = getEventDuration(event);
 
         sports[sport] = (sports[sport] || 0) + 1;
         competitions[competition] = (competitions[competition] || 0) + 1;
         hourlyData[startHour]++;
         sportBroadcastHours[sport] = (sportBroadcastHours[sport] || 0) + duration;
         totalMinutes += duration;
+
+        // Subscription vs PPV (Pay-Per-View)
+        const entitlements = event.EntitlementIds || [];
+        const isPPV = entitlements.some(id => id.toLowerCase().includes('ppv'));
+        if (isPPV) {
+          paidCount++; // Using paidCount for PPV
+        } else {
+          freeCount++; // Using freeCount for standard subscription
+        }
+
+        // Geo-restricted
+        if (event.IsGeoRestricted) geoRestrictedCount++;
+
+        // Video quality features
+        const heConfig = event.HeEventTypeConfig || {};
+        if (heConfig.is4k || heConfig.is4kUpscaled) has4k++;
+        if (heConfig.isHdr) hasHdr++;
+        if (event.IsMultiView) hasMultiView++;
+        if (event.IsDownloadable) hasDownload++;
+
+        // Sport by hour for heatmap
+        if (!sportByHour[sport]) {
+          sportByHour[sport] = new Array(24).fill(0);
+        }
+        sportByHour[sport][startHour]++;
       });
 
       const totalHours = Math.round(totalMinutes / 60);
@@ -1211,19 +1387,30 @@
       const uniqueCompetitions = Object.keys(competitions).length;
       const peakHour = hourlyData.indexOf(Math.max(...hourlyData));
 
-      // Quick Stats
+      // Check how many events have actual vs estimated durations
+      const eventsWithActualDuration = events.filter(e => e.End || e.DurationInMillis).length;
+      const eventsWithEstimated = events.length - eventsWithActualDuration;
+      console.log(`Duration stats: ${eventsWithActualDuration} actual, ${eventsWithEstimated} estimated`);
+      console.log(`Total broadcast minutes: ${totalMinutes}, hours: ${totalMinutes/60}`);
+
+      // Quick Stats - show different labels based on data quality
+      const mostlyActual = eventsWithActualDuration > eventsWithEstimated;
+      const broadcastLabel = mostlyActual ? 'Total Broadcast Time' : 'Est. Broadcast Time';
+      const durationLabel = mostlyActual ? 'Avg Duration' : 'Est. Avg Duration';
+      const tilde = mostlyActual ? '' : '~';
+
       document.getElementById('quickStats').innerHTML = `
         <div class="quick-stat-card">
           <div class="value">${totalEvents}</div>
           <div class="label">Total Events</div>
         </div>
         <div class="quick-stat-card">
-          <div class="value">${totalHours}h</div>
-          <div class="label">Total Broadcast Time</div>
+          <div class="value">${tilde}${totalHours}h</div>
+          <div class="label">${broadcastLabel}</div>
         </div>
         <div class="quick-stat-card">
-          <div class="value">${avgDuration}m</div>
-          <div class="label">Avg Event Duration</div>
+          <div class="value">${tilde}${avgDuration}m</div>
+          <div class="label">${durationLabel}</div>
         </div>
         <div class="quick-stat-card">
           <div class="value">${uniqueSports}</div>
@@ -1381,29 +1568,123 @@
         }
       });
 
-      // Top Events by Duration Table
-      const eventsWithDuration = events.map(e => {
-        const start = parseEventDate(e.Start);
-        const end = parseEventDate(e.End);
-        let dur = 0;
-        if (start && end && end > start) {
-          dur = (end - start) / (1000 * 60);
+      // Subscription vs PPV Content Chart
+      chartInstances.access = new Chart(document.getElementById('accessChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Subscription', 'PPV (Extra Cost)'],
+          datasets: [{
+            data: [freeCount, paidCount],
+            backgroundColor: ['#7c3aed', '#f97316'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: '#888', font: { size: 11 } }
+            }
+          }
         }
-        return { ...e, duration: dur };
-      }).filter(e => e.duration > 0).sort((a, b) => b.duration - a.duration).slice(0, 10);
+      });
+
+      // Video Quality Features Chart
+      chartInstances.quality = new Chart(document.getElementById('qualityChart'), {
+        type: 'bar',
+        data: {
+          labels: ['4K', 'HDR', 'Multi-View', 'Downloadable'],
+          datasets: [{
+            label: 'Events',
+            data: [has4k, hasHdr, hasMultiView, hasDownload],
+            backgroundColor: ['#f97316', '#eab308', '#06b6d4', '#22c55e'],
+            borderWidth: 0,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#fff' }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#888' },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Time of Day Heatmap (Sport by Hour)
+      const heatmapContainer = document.getElementById('timeHeatmap');
+      const sortedSportsForHeatmap = Object.entries(sportByHour)
+        .sort((a, b) => b[1].reduce((s, v) => s + v, 0) - a[1].reduce((s, v) => s + v, 0))
+        .slice(0, 8);
+
+      // Find max value for color scaling
+      let maxHeatValue = 0;
+      sortedSportsForHeatmap.forEach(([sport, hours]) => {
+        hours.forEach(v => { if (v > maxHeatValue) maxHeatValue = v; });
+      });
+
+      // Build heatmap HTML
+      let heatmapHTML = '<div class="heatmap-row"><div class="heatmap-label"></div>';
+      for (let h = 0; h < 24; h++) {
+        heatmapHTML += `<div class="heatmap-header">${h}</div>`;
+      }
+      heatmapHTML += '</div>';
+
+      sortedSportsForHeatmap.forEach(([sport, hours]) => {
+        const shortSport = sport.length > 8 ? sport.substring(0, 8) + '..' : sport;
+        heatmapHTML += `<div class="heatmap-row"><div class="heatmap-label">${shortSport}</div>`;
+        hours.forEach((count, hour) => {
+          const intensity = maxHeatValue > 0 ? count / maxHeatValue : 0;
+          let bgColor;
+          if (count === 0) {
+            bgColor = '#1e1e2e';
+          } else if (intensity < 0.33) {
+            bgColor = '#3b1d5c';
+          } else if (intensity < 0.66) {
+            bgColor = '#7c3aed';
+          } else {
+            bgColor = '#00d4ff';
+          }
+          heatmapHTML += `<div class="heatmap-cell" style="background-color: ${bgColor}" title="${sport} at ${hour}:00 - ${count} event${count !== 1 ? 's' : ''}"></div>`;
+        });
+        heatmapHTML += '</div>';
+      });
+
+      heatmapContainer.innerHTML = heatmapHTML;
+
+      // Top Events by Duration Table (sorted by estimated/actual duration)
+      const eventsWithDuration = events.map(e => ({
+        ...e,
+        duration: getEventDuration(e),
+        hasActualDuration: !!(e.End || e.DurationInMillis)
+      })).sort((a, b) => b.duration - a.duration).slice(0, 10);
 
       const tbody = document.getElementById('topEventsBody');
       tbody.innerHTML = eventsWithDuration.map((event, i) => {
         const hours = Math.floor(event.duration / 60);
         const mins = Math.round(event.duration % 60);
         const durationStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+        const estLabel = event.hasActualDuration ? '' : ' ~';
 
         return `
           <tr>
             <td class="rank">${i + 1}</td>
             <td>${event.Title.length > 40 ? event.Title.substring(0, 40) + '...' : event.Title}</td>
             <td class="sport-cell">${event.Sport?.Title || 'N/A'}</td>
-            <td class="duration">${durationStr}</td>
+            <td class="duration">${estLabel}${durationStr}</td>
           </tr>
         `;
       }).join('');
