@@ -1237,6 +1237,19 @@
     function openAnalytics() {
       if (allEvents.length === 0) return;
 
+      // Get selected date and country for header
+      const dateStr = document.getElementById('datePicker').value;
+      const countrySelect = document.getElementById('countryPicker');
+      const countryName = countrySelect.options[countrySelect.selectedIndex].text.replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '').trim();
+
+      // Format the date nicely
+      const [year, month, day] = dateStr.split('-');
+      const dateObj = new Date(year, month - 1, day);
+      const formattedDate = dateObj.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+      // Update the header
+      document.querySelector('.analytics-header h2').innerHTML = `Analytics for DAZN<br><span style="font-size: 0.6em; opacity: 0.8;">${formattedDate} in ${countryName}</span>`;
+
       document.getElementById('analyticsModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
 
