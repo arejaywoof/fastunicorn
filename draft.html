@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Wrestling Draft 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1e3c72;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        
+        .draft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .drafter-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .drafter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .drafter-card:nth-child(1) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .drafter-card:nth-child(2) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .drafter-card:nth-child(3) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .drafter-card:nth-child(4) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .drafter-card:nth-child(5) { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .drafter-card:nth-child(6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .drafter-card:nth-child(7) { background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%); }
+        .drafter-card:nth-child(8) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .drafter-card:nth-child(9) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+        .drafter-card:nth-child(10) { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
+        .drafter-card:nth-child(11) { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+        .drafter-card:nth-child(12) { background: linear-gradient(135deg, #f8b500 0%, #fceabb 100%); }
+        
+        .drafter-name {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.5);
+        }
+        
+        .pick-list {
+            list-style: none;
+        }
+        
+        .pick-item {
+            background: rgba(255,255,255,0.95);
+            margin: 8px 0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .round-number {
+            background: #1e3c72;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .wrestler-name {
+            color: #333;
+            font-weight: 500;
+            flex-grow: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .draft-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 The Ultimate Wrestling Draft 🏆</h1>
+        <p class="subtitle">2025 All-Time Draft • 10 Rounds • 12 Drafters</p>
+        
+        <div class="draft-grid">
+            <!-- Juan -->
+            <div class="drafter-card">
+                <div class="drafter-name">Juan<br><small style="font-size:0.6em;">(Every Juan Has An Opinion)</small></div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Stone Cold</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Mick Foley</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">CM Punk</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Lou Thesz</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Buddy Rodgers</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Mitsuharu Misawa</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Jerry Lawler</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Karl Gotch</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Jim Londos</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">RAVEN</span></li>
+                </ul>
+            </div>
+            
+            <!-- Matt Brown -->
+            <div class="drafter-card">
+                <div class="drafter-name">Matt Brown<br><small style="font-size:0.6em;">(Brunch Boxing)</small></div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Bret Hart</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Andre the Giant</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Terry Funk</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Ted DiBiase</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Jake Roberts</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Lex Luger</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">British Bulldog</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Kerry Von Erich</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">The Iron Sheik</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">The Brooklyn Brawler</span></li>
+                </ul>
+            </div>
+            
+            <!-- J Ro -->
+            <div class="drafter-card">
+                <div class="drafter-name">J Ro</div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Randy Savage</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Bryan Danielson</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Roddy Piper</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Nick Bockwinkel</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Antoni Inoki</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Ed Strangler Lewis</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Verne Gagne</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Dynamite Kid</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Freddie Blassie</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Vince McMahon</span></li>
+                </ul>
+            </div>
+            
+            <!-- Basil -->
+            <div class="drafter-card">
+                <div class="drafter-name">Basil</div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Hogan</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">RVD</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Ultimate Warrior</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Sid</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Will Ospreay</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">MJF</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Owen Hart</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Shelton Benjamin</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Sgt Slaughter</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Sabu</span></li>
+                </ul>
+            </div>
+            
+            <!-- T.Y. -->
+            <div class="drafter-card">
+                <div class="drafter-name">T.Y.<br><small style="font-size:0.6em;">(Sunday Morning Sermon)</small></div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Roman Reigns</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Sting</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Batista</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Seth Rollins</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Triple H</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Jon Moxley</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Christian Cage</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Kane</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Jeff Hardy</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Big E</span></li>
+                </ul>
+            </div>
+            
+            <!-- Vivi -->
+            <div class="drafter-card">
+                <div class="drafter-name">Vivi</div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Kenny Omega</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Eddie Guerrero</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Chris Benoit</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Rey Mysterio</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Stan Hansen</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Kenta Kobashi</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Tito Santana</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Jushin Thunder Liger</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">El Hijo del Santo</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Katsuyori Shibata</span></li>
+                </ul>
+            </div>
+            
+            <!-- Lord -->
+            <div class="drafter-card">
+                <div class="drafter-name">Lord</div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Kurt Angle</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Ricky Steamboat</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Samoa Joe</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Big Show</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Rikidozan</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Haku</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Mil Mascaras</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">The Ultimo Dragon</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Arn Anderson</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Bandido</span></li>
+                </ul>
+            </div>
+            
+            <!-- Ezra -->
+            <div class="drafter-card">
+                <div class="drafter-name">Ezra<br><small style="font-size:0.6em;">(Brunch Boxing)</small></div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">The Rock</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Dusty Rhodes</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Harley Race</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Bruno</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Gorgeous George</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Bruiser Brody</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Giant Baba</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Dory Funk Jr</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">El Santo</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">David Von Erich</span></li>
+                </ul>
+            </div>
+            
+            <!-- Kevin -->
+            <div class="drafter-card">
+                <div class="drafter-name">Kevin</div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Shawn Michaels</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Undertaker</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Vader</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Booker T</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Kevin Nash</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Cody Rhodes</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Ron Simmons</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Kevin Owens</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Swerve Strickland</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Bray Wyatt</span></li>
+                </ul>
+            </div>
+            
+            <!-- Hitman -->
+            <div class="drafter-card">
+                <div class="drafter-name">Hitman</div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Scott Steiner</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Randy Orton</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Goldberg</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Scott Hall</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Superstar Billy Graham</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Edge</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">DDP</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">LA Knight</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Dick The Bruiser</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">D Lo Brown</span></li>
+                </ul>
+            </div>
+            
+            <!-- King P -->
+            <div class="drafter-card">
+                <div class="drafter-name">King P<br><small style="font-size:0.6em;">(Ring Gang Radio)</small></div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Ric Flair</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">Chris Jericho</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">AJ Styles</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Kazuchika Okada</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">Bobby Lashley</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Bam Bam Bigelow</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Bob Backlund</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Hiroshi Tanahashi</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Pedro Morales</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Sami Zayn</span></li>
+                </ul>
+            </div>
+            
+            <!-- Bobby -->
+            <div class="drafter-card">
+                <div class="drafter-name">Bobby</div>
+                <ul class="pick-list">
+                    <li class="pick-item"><span class="round-number">1</span><span class="wrestler-name">Brock Lesnar</span></li>
+                    <li class="pick-item"><span class="round-number">2</span><span class="wrestler-name">John Cena</span></li>
+                    <li class="pick-item"><span class="round-number">3</span><span class="wrestler-name">Mr Perfect</span></li>
+                    <li class="pick-item"><span class="round-number">4</span><span class="wrestler-name">Rick Rude</span></li>
+                    <li class="pick-item"><span class="round-number">5</span><span class="wrestler-name">The Great Muta</span></li>
+                    <li class="pick-item"><span class="round-number">6</span><span class="wrestler-name">Jesse Ventura</span></li>
+                    <li class="pick-item"><span class="round-number">7</span><span class="wrestler-name">Gunther</span></li>
+                    <li class="pick-item"><span class="round-number">8</span><span class="wrestler-name">Bron Breaker</span></li>
+                    <li class="pick-item"><span class="round-number">9</span><span class="wrestler-name">Jacob Fatu</span></li>
+                    <li class="pick-item"><span class="round-number">10</span><span class="wrestler-name">Junkyard Dog</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
