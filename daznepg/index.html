@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DAZN Schedule Browser</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -1246,9 +1247,7 @@
         </div>
         <div class="chart-card">
           <h3>Top Competitions</h3>
-          <div class="chart-wrapper">
-            <canvas id="competitionsChart"></canvas>
-          </div>
+          <div class="quick-stats" id="competitionsStats" style="margin-top: 10px;"></div>
         </div>
         <div class="chart-card">
           <h3>Subscription vs PPV</h3>
@@ -1258,9 +1257,7 @@
         </div>
         <div class="chart-card">
           <h3>Video Quality Features</h3>
-          <div class="chart-wrapper">
-            <canvas id="qualityChart"></canvas>
-          </div>
+          <div class="quick-stats" id="qualityStats" style="margin-top: 10px;"></div>
         </div>
       </div>
 
@@ -1783,7 +1780,10 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            datalabels: { display: false }
+          },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#fff' } },
             y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' }, beginAtZero: true }
@@ -1810,7 +1810,8 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#888' } }
+            legend: { labels: { color: '#888' } },
+            datalabels: { display: false }
           },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#888', font: { size: 10 } } },
@@ -2102,7 +2103,9 @@
 
       // Sports Pie Chart
       const sortedSports = Object.entries(sports).sort((a, b) => b[1] - a[1]);
-      chartInstances.sportsPie = new Chart(document.getElementById('sportsPieChart'), {
+
+      // Configure chart with inline plugin registration
+      const sportsPieConfig = {
         type: 'doughnut',
         data: {
           labels: sortedSports.map(s => s[0]),
@@ -2119,10 +2122,28 @@
             legend: {
               position: 'right',
               labels: { color: '#888', font: { size: 11 } }
+            },
+            datalabels: {
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 13
+              },
+              formatter: (value, ctx) => {
+                const label = ctx.chart.data.labels[ctx.dataIndex];
+                const percentage = ((value / totalEvents) * 100).toFixed(1);
+                return `${value}\n(${percentage}%)`;
+              },
+              textAlign: 'center',
+              anchor: 'center',
+              align: 'center'
             }
           }
-        }
-      });
+        },
+        plugins: [ChartDataLabels]
+      };
+
+      chartInstances.sportsPie = new Chart(document.getElementById('sportsPieChart'), sportsPieConfig);
 
       // Hourly Bar Chart
       chartInstances.hourlyBar = new Chart(document.getElementById('hourlyBarChart'), {
@@ -2142,7 +2163,8 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            datalabels: { display: false }
           },
           scales: {
             x: {
@@ -2180,7 +2202,8 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            datalabels: { display: false }
           },
           scales: {
             x: {
@@ -2196,47 +2219,23 @@
         }
       });
 
-      // Top Competitions Chart
+      // Top Competitions Stats
       const sortedComps = Object.entries(competitions)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 8);
+        .slice(0, 6);
 
-      chartInstances.competitions = new Chart(document.getElementById('competitionsChart'), {
-        type: 'bar',
-        data: {
-          labels: sortedComps.map(c => c[0].length > 25 ? c[0].substring(0, 25) + '...' : c[0]),
-          datasets: [{
-            label: 'Events',
-            data: sortedComps.map(c => c[1]),
-            backgroundColor: 'rgba(0, 212, 255, 0.7)',
-            borderColor: '#00d4ff',
-            borderWidth: 1,
-            borderRadius: 4
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255,255,255,0.05)' },
-              ticks: { color: '#888' },
-              beginAtZero: true
-            },
-            y: {
-              grid: { display: false },
-              ticks: { color: '#fff', font: { size: 10 } }
-            }
-          }
-        }
-      });
+      const competitionColors = ['#00d4ff', '#7c3aed', '#22c55e', '#f97316', '#ec4899', '#eab308'];
+
+      document.getElementById('competitionsStats').innerHTML = sortedComps.map((comp, i) => `
+        <div class="quick-stat-card">
+          <div class="value" style="color: ${competitionColors[i]};">${comp[1]}</div>
+          <div class="label">${comp[0].length > 20 ? comp[0].substring(0, 20) + '...' : comp[0]}</div>
+        </div>
+      `).join('');
 
       // Subscription vs PPV Content Chart
-      chartInstances.access = new Chart(document.getElementById('accessChart'), {
+      const totalAccessEvents = freeCount + paidCount;
+      const accessChartConfig = {
         type: 'doughnut',
         data: {
           labels: ['Subscription', 'PPV (Extra Cost)'],
@@ -2253,43 +2252,47 @@
             legend: {
               position: 'right',
               labels: { color: '#888', font: { size: 11 } }
-            }
-          }
-        }
-      });
-
-      // Video Quality Features Chart
-      chartInstances.quality = new Chart(document.getElementById('qualityChart'), {
-        type: 'bar',
-        data: {
-          labels: ['4K', 'HDR', 'Multi-View', 'Downloadable'],
-          datasets: [{
-            label: 'Events',
-            data: [has4k, hasHdr, hasMultiView, hasDownload],
-            backgroundColor: ['#f97316', '#eab308', '#06b6d4', '#22c55e'],
-            borderWidth: 0,
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: '#fff' }
             },
-            y: {
-              grid: { color: 'rgba(255,255,255,0.05)' },
-              ticks: { color: '#888' },
-              beginAtZero: true
+            datalabels: {
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 13
+              },
+              formatter: (value, ctx) => {
+                const percentage = ((value / totalAccessEvents) * 100).toFixed(1);
+                return `${value}\n(${percentage}%)`;
+              },
+              textAlign: 'center',
+              anchor: 'center',
+              align: 'center'
             }
           }
-        }
-      });
+        },
+        plugins: [ChartDataLabels]
+      };
+
+      chartInstances.access = new Chart(document.getElementById('accessChart'), accessChartConfig);
+
+      // Video Quality Features Stats
+      document.getElementById('qualityStats').innerHTML = `
+        <div class="quick-stat-card">
+          <div class="value" style="color: #f97316;">${has4k}</div>
+          <div class="label">4K Events</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="value" style="color: #eab308;">${hasHdr}</div>
+          <div class="label">HDR Events</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="value" style="color: #06b6d4;">${hasMultiView}</div>
+          <div class="label">Multi-View Events</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="value" style="color: #22c55e;">${hasDownload}</div>
+          <div class="label">Downloadable Events</div>
+        </div>
+      `;
 
       // Time of Day Heatmap (Sport by Hour)
       const heatmapContainer = document.getElementById('timeHeatmap');
