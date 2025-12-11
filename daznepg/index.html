@@ -1241,9 +1241,7 @@
         </div>
         <div class="chart-card">
           <h3>Broadcast Hours by Sport</h3>
-          <div class="chart-wrapper">
-            <canvas id="broadcastHoursChart"></canvas>
-          </div>
+          <div class="quick-stats" id="broadcastHoursStats" style="margin-top: 10px;"></div>
         </div>
         <div class="chart-card">
           <h3>Top Competitions</h3>
@@ -1251,9 +1249,7 @@
         </div>
         <div class="chart-card">
           <h3>Subscription vs PPV</h3>
-          <div class="chart-wrapper">
-            <canvas id="accessChart"></canvas>
-          </div>
+          <div class="quick-stats" id="accessStats" style="margin-top: 10px;"></div>
         </div>
         <div class="chart-card">
           <h3>Video Quality Features</h3>
@@ -2180,44 +2176,22 @@
         }
       });
 
-      // Broadcast Hours by Sport (Horizontal Bar)
+      // Broadcast Hours by Sport Stats
       const sortedBroadcast = Object.entries(sportBroadcastHours)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
+        .slice(0, 6);
 
-      chartInstances.broadcastHours = new Chart(document.getElementById('broadcastHoursChart'), {
-        type: 'bar',
-        data: {
-          labels: sortedBroadcast.map(s => s[0]),
-          datasets: [{
-            label: 'Hours',
-            data: sortedBroadcast.map(s => Math.round(s[1] / 60 * 10) / 10),
-            backgroundColor: colors,
-            borderWidth: 0,
-            borderRadius: 4
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: { display: false }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255,255,255,0.05)' },
-              ticks: { color: '#888' },
-              beginAtZero: true
-            },
-            y: {
-              grid: { display: false },
-              ticks: { color: '#fff', font: { size: 11 } }
-            }
-          }
-        }
-      });
+      const broadcastColors = ['#7c3aed', '#00d4ff', '#f97316', '#22c55e', '#ec4899', '#eab308'];
+
+      document.getElementById('broadcastHoursStats').innerHTML = sortedBroadcast.map((sport, i) => {
+        const hours = Math.round(sport[1] / 60 * 10) / 10;
+        return `
+          <div class="quick-stat-card">
+            <div class="value" style="color: ${broadcastColors[i]};">${hours}h</div>
+            <div class="label">${sport[0]}</div>
+          </div>
+        `;
+      }).join('');
 
       // Top Competitions Stats
       const sortedComps = Object.entries(competitions)
@@ -2233,46 +2207,17 @@
         </div>
       `).join('');
 
-      // Subscription vs PPV Content Chart
-      const totalAccessEvents = freeCount + paidCount;
-      const accessChartConfig = {
-        type: 'doughnut',
-        data: {
-          labels: ['Subscription', 'PPV (Extra Cost)'],
-          datasets: [{
-            data: [freeCount, paidCount],
-            backgroundColor: ['#7c3aed', '#f97316'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'right',
-              labels: { color: '#888', font: { size: 11 } }
-            },
-            datalabels: {
-              color: '#fff',
-              font: {
-                weight: 'bold',
-                size: 13
-              },
-              formatter: (value, ctx) => {
-                const percentage = ((value / totalAccessEvents) * 100).toFixed(1);
-                return `${value}\n(${percentage}%)`;
-              },
-              textAlign: 'center',
-              anchor: 'center',
-              align: 'center'
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      };
-
-      chartInstances.access = new Chart(document.getElementById('accessChart'), accessChartConfig);
+      // Subscription vs PPV Stats
+      document.getElementById('accessStats').innerHTML = `
+        <div class="quick-stat-card">
+          <div class="value" style="color: #7c3aed;">${freeCount}</div>
+          <div class="label">Subscription Events</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="value" style="color: #f97316;">${paidCount}</div>
+          <div class="label">PPV Events</div>
+        </div>
+      `;
 
       // Video Quality Features Stats
       document.getElementById('qualityStats').innerHTML = `
