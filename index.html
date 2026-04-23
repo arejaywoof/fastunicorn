@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Image Browser</title>
+    <style>
+      :root {
+        --bg: #f4efe7;
+        --bg-strong: #e9dece;
+        --panel: rgba(255, 250, 242, 0.84);
+        --panel-strong: rgba(255, 250, 242, 0.94);
+        --text: #1f1a16;
+        --muted: #6c5d52;
+        --line: rgba(58, 45, 34, 0.14);
+        --accent: #b3471d;
+        --accent-soft: rgba(179, 71, 29, 0.1);
+        --shadow: 0 18px 50px rgba(62, 42, 23, 0.16);
+        --radius: 22px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 35%),
+          radial-gradient(circle at bottom right, rgba(179, 71, 29, 0.14), transparent 32%),
+          linear-gradient(135deg, #f6f1e8, #e8dccb 58%, #eadfcf);
+      }
+
+      .page {
+        width: min(1440px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 24px 0 40px;
+      }
+
+      .hero {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        padding: 12px 0 18px;
+        backdrop-filter: blur(18px);
+        background: linear-gradient(to bottom, rgba(244, 239, 231, 0.92), rgba(244, 239, 231, 0.68), transparent);
+      }
+
+      .hero-card {
+        display: grid;
+        gap: 18px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        margin: 0;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.6rem);
+        line-height: 0.94;
+        font-weight: 700;
+      }
+
+      .subhead {
+        margin: 0;
+        max-width: 76ch;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto auto;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .search,
+      .button,
+      .status-pill {
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+      }
+
+      .search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px;
+        min-height: 52px;
+      }
+
+      .search input {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+        outline: none;
+      }
+
+      .button,
+      .status-pill {
+        min-height: 52px;
+        padding: 0 18px;
+        color: var(--text);
+        font: inherit;
+      }
+
+      .button {
+        cursor: pointer;
+        transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+      }
+
+      .button:hover,
+      .button:focus-visible {
+        transform: translateY(-1px);
+        border-color: rgba(179, 71, 29, 0.36);
+        background: #fff7ee;
+        outline: none;
+      }
+
+      .button.primary {
+        background: linear-gradient(135deg, #c65629, #983516);
+        color: #fff8f2;
+        border-color: transparent;
+      }
+
+      .button.primary:hover,
+      .button.primary:focus-visible {
+        background: linear-gradient(135deg, #d56031, #8f2f11);
+      }
+
+      .status {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        color: var(--muted);
+      }
+
+      .status-pill strong {
+        color: var(--text);
+        margin-left: 6px;
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        min-height: 220px;
+        border: 1px solid rgba(58, 45, 34, 0.1);
+        border-radius: var(--radius);
+        background: rgba(255, 250, 242, 0.72);
+        box-shadow: 0 8px 24px rgba(62, 42, 23, 0.08);
+        cursor: pointer;
+        transform: translateY(10px);
+        opacity: 0;
+        animation: rise 420ms ease forwards;
+      }
+
+      .card img {
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        display: block;
+        object-fit: cover;
+        background: linear-gradient(135deg, #efe5d6, #e3d4c1);
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(31, 26, 22, 0.48), transparent 55%);
+        opacity: 0;
+        transition: opacity 160ms ease;
+      }
+
+      .card:hover::after,
+      .card:focus-visible::after {
+        opacity: 1;
+      }
+
+      .card-meta {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 12px;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: end;
+        color: white;
+        opacity: 0;
+        transition: opacity 160ms ease;
+      }
+
+      .card:hover .card-meta,
+      .card:focus-visible .card-meta {
+        opacity: 1;
+      }
+
+      .card-index {
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .card-url {
+        max-width: 60%;
+        font-size: 0.78rem;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .card.broken {
+        background:
+          linear-gradient(135deg, rgba(179, 71, 29, 0.18), rgba(31, 26, 22, 0.08)),
+          rgba(255, 250, 242, 0.72);
+      }
+
+      .card.broken img {
+        opacity: 0;
+      }
+
+      .fallback[hidden] {
+        display: none;
+      }
+
+      .card.broken .fallback {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .empty,
+      .loading,
+      .error {
+        margin-top: 22px;
+        padding: 32px 24px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .empty[hidden],
+      .loading[hidden],
+      .error[hidden],
+      .modal[hidden] {
+        display: none;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(22, 16, 12, 0.84);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal-panel {
+        width: min(1320px, 100%);
+        max-height: 100%;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .modal-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-radius: 20px;
+        background: rgba(255, 250, 242, 0.94);
+      }
+
+      .modal-info {
+        min-width: 0;
+      }
+
+      .modal-info p {
+        margin: 0;
+      }
+
+      .modal-info .modal-url {
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: end;
+      }
+
+      .modal-stage {
+        position: relative;
+        min-height: 0;
+        border-radius: 24px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 44%),
+          rgba(0, 0, 0, 0.42);
+      }
+
+      .modal-stage img {
+        display: block;
+        width: 100%;
+        height: min(78vh, 100%);
+        object-fit: contain;
+      }
+
+      .nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 52px;
+        height: 52px;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(255, 250, 242, 0.86);
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      .nav.prev {
+        left: 16px;
+      }
+
+      .nav.next {
+        right: 16px;
+      }
+
+      .footer-note {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 0.92rem;
+        text-align: right;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 880px) {
+        .controls {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-bar {
+          align-items: start;
+          flex-direction: column;
+        }
+
+        .modal-actions {
+          width: 100%;
+          justify-content: start;
+        }
+
+        .nav {
+          width: 46px;
+          height: 46px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <section class="hero-card">
+          <p class="eyebrow">Static Image Index</p>
+          <div>
+            <h1>Browse the full image set without a backend.</h1>
+            <p class="subhead">
+              This page loads image URLs from <code>output.txt</code>, shows them in a fast lazy-loaded grid,
+              and opens each image in a larger viewer when selected.
+            </p>
+          </div>
+
+          <div class="controls">
+            <label class="search" for="search">
+              <span>Search</span>
+              <input id="search" type="search" placeholder="Filter by URL fragment or image id">
+            </label>
+            <button class="button" id="shuffleButton" type="button">Shuffle</button>
+            <button class="button" id="resetButton" type="button">Reset</button>
+            <button class="button primary" id="topButton" type="button">Back To Top</button>
+          </div>
+
+          <div class="status">
+            <div class="status-pill">Loaded<strong id="loadedCount">0</strong></div>
+            <div class="status-pill">Visible<strong id="visibleCount">0</strong></div>
+            <div class="status-pill">Broken<strong id="brokenCount">0</strong></div>
+          </div>
+        </section>
+      </header>
+
+      <section class="loading" id="loadingState">Loading image list from <code>output.txt</code>...</section>
+      <section class="error" id="errorState" hidden></section>
+      <section class="empty" id="emptyState" hidden>No images match the current filter.</section>
+      <main class="gallery" id="gallery" aria-live="polite"></main>
+      <p class="footer-note">Tip: use the search box to narrow the list, or arrow keys inside the viewer to move left and right.</p>
+    </div>
+
+    <div class="modal" id="modal" hidden>
+      <div class="modal-panel">
+        <div class="modal-bar">
+          <div class="modal-info">
+            <p id="modalIndex">Image</p>
+            <p class="modal-url" id="modalUrl"></p>
+          </div>
+          <div class="modal-actions">
+            <button class="button" id="copyButton" type="button">Copy URL</button>
+            <a class="button" id="openButton" target="_blank" rel="noopener noreferrer">Open Source</a>
+            <button class="button primary" id="closeButton" type="button">Close</button>
+          </div>
+        </div>
+        <div class="modal-stage" id="modalStage">
+          <button class="nav prev" id="prevButton" type="button" aria-label="Previous image">‹</button>
+          <img id="modalImage" alt="">
+          <button class="nav next" id="nextButton" type="button" aria-label="Next image">›</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const state = {
+        allEntries: [],
+        visibleEntries: [],
+        brokenIndices: new Set(),
+        modalIndex: -1,
+        renderVersion: 0
+      };
+
+      const elements = {
+        search: document.getElementById("search"),
+        gallery: document.getElementById("gallery"),
+        loadingState: document.getElementById("loadingState"),
+        errorState: document.getElementById("errorState"),
+        emptyState: document.getElementById("emptyState"),
+        loadedCount: document.getElementById("loadedCount"),
+        visibleCount: document.getElementById("visibleCount"),
+        brokenCount: document.getElementById("brokenCount"),
+        shuffleButton: document.getElementById("shuffleButton"),
+        resetButton: document.getElementById("resetButton"),
+        topButton: document.getElementById("topButton"),
+        modal: document.getElementById("modal"),
+        modalImage: document.getElementById("modalImage"),
+        modalIndex: document.getElementById("modalIndex"),
+        modalUrl: document.getElementById("modalUrl"),
+        openButton: document.getElementById("openButton"),
+        copyButton: document.getElementById("copyButton"),
+        closeButton: document.getElementById("closeButton"),
+        prevButton: document.getElementById("prevButton"),
+        nextButton: document.getElementById("nextButton")
+      };
+
+      async function loadUrls() {
+        try {
+          const response = await fetch("output.txt", { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error("Could not load output.txt. Keep it next to index.html when publishing.");
+          }
+
+          const text = await response.text();
+          const urls = text
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+
+          state.allEntries = urls.map((url, index) => ({ url, index }));
+          state.visibleEntries = [...state.allEntries];
+          updateCounts();
+          renderVisibleUrls();
+        } catch (error) {
+          elements.errorState.hidden = false;
+          const localFileHint = window.location.protocol === "file:"
+            ? " This page is being opened as a local file. Browsers often block loading output.txt that way, so use GitHub Pages or a local web server instead."
+            : "";
+          elements.errorState.textContent = `${error.message}${localFileHint}`;
+        } finally {
+          elements.loadingState.hidden = true;
+        }
+      }
+
+      function updateCounts() {
+        elements.loadedCount.textContent = String(state.allEntries.length);
+        elements.visibleCount.textContent = String(state.visibleEntries.length);
+        elements.brokenCount.textContent = String(state.brokenIndices.size);
+      }
+
+      function renderVisibleUrls() {
+        state.renderVersion += 1;
+        const renderVersion = state.renderVersion;
+        elements.gallery.innerHTML = "";
+        elements.emptyState.hidden = state.visibleEntries.length !== 0;
+
+        let cursor = 0;
+        const batchSize = 60;
+
+        function appendBatch() {
+          if (renderVersion !== state.renderVersion) {
+            return;
+          }
+
+          const fragment = document.createDocumentFragment();
+          const slice = state.visibleEntries.slice(cursor, cursor + batchSize);
+
+          slice.forEach((entry, offset) => {
+            fragment.appendChild(createCard(entry, cursor + offset));
+          });
+
+          elements.gallery.appendChild(fragment);
+          cursor += batchSize;
+
+          if (cursor < state.visibleEntries.length) {
+            requestAnimationFrame(appendBatch);
+          }
+        }
+
+        appendBatch();
+        updateCounts();
+      }
+
+      function createCard(entry, visibleIndex) {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "card";
+        card.dataset.url = entry.url;
+        card.dataset.index = String(entry.index);
+        card.title = entry.url;
+
+        const image = document.createElement("img");
+        image.loading = "lazy";
+        image.decoding = "async";
+        image.referrerPolicy = "no-referrer";
+        image.src = entry.url;
+        image.alt = `Image ${entry.index + 1}`;
+        image.addEventListener("error", () => {
+          card.classList.add("broken");
+          fallback.hidden = false;
+          state.brokenIndices.add(entry.index);
+          updateCounts();
+        });
+
+        const fallback = document.createElement("div");
+        fallback.className = "fallback";
+        fallback.textContent = "Image failed to load";
+        fallback.hidden = true;
+
+        const meta = document.createElement("div");
+        meta.className = "card-meta";
+
+        const indexLabel = document.createElement("div");
+        indexLabel.className = "card-index";
+        indexLabel.textContent = `#${entry.index + 1}`;
+
+        const urlLabel = document.createElement("div");
+        urlLabel.className = "card-url";
+        urlLabel.textContent = entry.url.split("/").pop() || entry.url;
+
+        meta.append(indexLabel, urlLabel);
+        card.append(image, fallback, meta);
+        card.addEventListener("click", () => openModalByIndex(visibleIndex));
+        return card;
+      }
+
+      function openModalByIndex(visibleIndex) {
+        if (visibleIndex < 0 || visibleIndex >= state.visibleEntries.length) {
+          return;
+        }
+        state.modalIndex = visibleIndex;
+        updateModal();
+        elements.modal.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal() {
+        elements.modal.hidden = true;
+        document.body.style.overflow = "";
+      }
+
+      function updateModal() {
+        if (state.modalIndex < 0 || state.modalIndex >= state.visibleEntries.length) {
+          return;
+        }
+
+        const entry = state.visibleEntries[state.modalIndex];
+        elements.modalImage.src = entry.url;
+        elements.modalImage.alt = `Image ${entry.index + 1}`;
+        elements.modalImage.referrerPolicy = "no-referrer";
+        elements.modalIndex.textContent = `Image ${entry.index + 1} of ${state.allEntries.length}`;
+        elements.modalUrl.textContent = entry.url;
+        elements.openButton.href = entry.url;
+      }
+
+      function moveModal(step) {
+        if (state.visibleEntries.length === 0) {
+          return;
+        }
+        state.modalIndex = (state.modalIndex + step + state.visibleEntries.length) % state.visibleEntries.length;
+        updateModal();
+      }
+
+      function applyFilter() {
+        const query = elements.search.value.trim().toLowerCase();
+        if (!query) {
+          state.visibleEntries = [...state.allEntries];
+        } else {
+          state.visibleEntries = state.allEntries.filter((entry) => {
+            const indexMatch = String(entry.index + 1).includes(query);
+            return indexMatch || entry.url.toLowerCase().includes(query);
+          });
+        }
+        renderVisibleUrls();
+      }
+
+      function shuffleVisible() {
+        for (let i = state.visibleEntries.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [state.visibleEntries[i], state.visibleEntries[j]] = [state.visibleEntries[j], state.visibleEntries[i]];
+        }
+        renderVisibleUrls();
+      }
+
+      async function copyCurrentUrl() {
+        if (state.modalIndex < 0) {
+          return;
+        }
+        const { url } = state.visibleEntries[state.modalIndex];
+        try {
+          await navigator.clipboard.writeText(url);
+          elements.copyButton.textContent = "Copied";
+        } catch (error) {
+          elements.copyButton.textContent = "Copy failed";
+        }
+        window.setTimeout(() => {
+          elements.copyButton.textContent = "Copy URL";
+        }, 1200);
+      }
+
+      elements.search.addEventListener("input", applyFilter);
+      elements.shuffleButton.addEventListener("click", shuffleVisible);
+      elements.resetButton.addEventListener("click", () => {
+        elements.search.value = "";
+        state.visibleEntries = [...state.allEntries];
+        renderVisibleUrls();
+      });
+      elements.topButton.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      elements.closeButton.addEventListener("click", closeModal);
+      elements.prevButton.addEventListener("click", () => moveModal(-1));
+      elements.nextButton.addEventListener("click", () => moveModal(1));
+      elements.copyButton.addEventListener("click", copyCurrentUrl);
+      elements.modal.addEventListener("click", (event) => {
+        if (event.target === elements.modal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (elements.modal.hidden) {
+          return;
+        }
+        if (event.key === "Escape") {
+          closeModal();
+        } else if (event.key === "ArrowLeft") {
+          moveModal(-1);
+        } else if (event.key === "ArrowRight") {
+          moveModal(1);
+        }
+      });
+
+      loadUrls();
+    </script>
+  </body>
+</html>
