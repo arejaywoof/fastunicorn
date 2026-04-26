@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greatest Wrestling Matches Ever Draft</title>
+  <style>
+    :root {
+      --bg: #120f0d;
+      --bg-soft: #1f1916;
+      --panel: rgba(247, 239, 226, 0.9);
+      --panel-strong: #f7efe2;
+      --ink: #1b1411;
+      --muted: #6d5a4d;
+      --accent: #b33a24;
+      --accent-bright: #de5d38;
+      --gold: #c9a25d;
+      --line: rgba(27, 20, 17, 0.12);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Palatino Linotype", "Book Antiqua", "Iowan Old Style", Georgia, serif;
+      background:
+        radial-gradient(circle at top, rgba(201, 162, 93, 0.16), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(179, 58, 36, 0.18), transparent 24%),
+        linear-gradient(180deg, #1a1411 0%, #120f0d 32%, #0d0b0a 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      background-image:
+        linear-gradient(transparent 0, transparent calc(100% - 1px), rgba(255, 255, 255, 0.9) calc(100% - 1px)),
+        linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(255, 255, 255, 0.5) calc(100% - 1px));
+      background-size: 100% 28px, 28px 100%;
+      mix-blend-mode: soft-light;
+    }
+
+    .page {
+      width: min(1200px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      background:
+        linear-gradient(135deg, rgba(247, 239, 226, 0.08), rgba(247, 239, 226, 0.03)),
+        linear-gradient(145deg, rgba(179, 58, 36, 0.22), rgba(0, 0, 0, 0));
+      box-shadow: var(--shadow);
+      color: #f7efe2;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -4rem;
+      top: -4rem;
+      width: 16rem;
+      height: 16rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201, 162, 93, 0.26), transparent 65%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(247, 239, 226, 0.12);
+      font-family: "Trebuchet MS", "Gill Sans", "Franklin Gothic Medium", sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: "Arial Black", Impact, Haettenschweiler, "Franklin Gothic Heavy", sans-serif;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.3rem, 7vw, 5.6rem);
+      line-height: 0.95;
+      margin-top: 1rem;
+      max-width: 9ch;
+    }
+
+    .hero-copy {
+      max-width: 42rem;
+      margin-top: 1rem;
+      font-size: 1.04rem;
+      line-height: 1.6;
+      color: rgba(247, 239, 226, 0.88);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-top: 1.4rem;
+    }
+
+    .meta-pill {
+      padding: 0.8rem 1rem;
+      border: 1px solid rgba(247, 239, 226, 0.12);
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.18);
+      min-width: 9rem;
+    }
+
+    .meta-label {
+      display: block;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(247, 239, 226, 0.66);
+      margin-bottom: 0.25rem;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+    }
+
+    .meta-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff6ea;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+    }
+
+    .source-link {
+      display: inline-flex;
+      margin-top: 1.1rem;
+      color: #f6d79c;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.18em;
+    }
+
+    .panel {
+      margin-top: 1.35rem;
+      padding: 1.35rem;
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(12px);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.7fr);
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 0.95rem 1rem;
+      border-radius: 14px;
+      border: 1px solid rgba(27, 20, 17, 0.12);
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: 2px solid rgba(179, 58, 36, 0.35);
+      border-color: rgba(179, 58, 36, 0.45);
+    }
+
+    .jump-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .jump-links a {
+      padding: 0.55rem 0.8rem;
+      border-radius: 999px;
+      background: #241b16;
+      color: #f7efe2;
+      text-decoration: none;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      font-size: 0.9rem;
+      transition: transform 140ms ease, background 140ms ease;
+    }
+
+    .jump-links a:hover,
+    .jump-links a:focus-visible {
+      transform: translateY(-1px);
+      background: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+      gap: 1.35rem;
+      margin-top: 1.35rem;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+    }
+
+    .rounds-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .round-card {
+      padding: 1rem;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.62)),
+        linear-gradient(135deg, rgba(201, 162, 93, 0.16), rgba(179, 58, 36, 0.08));
+      border: 1px solid rgba(27, 20, 17, 0.08);
+    }
+
+    .round-card h3 {
+      font-size: 1.35rem;
+    }
+
+    .round-meta {
+      margin-top: 0.3rem;
+      color: var(--muted);
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      font-size: 0.92rem;
+    }
+
+    .round-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.95rem 0 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .pick {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0.8rem;
+      align-items: start;
+      padding: 0.72rem 0.8rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(27, 20, 17, 0.08);
+    }
+
+    .pick.hidden,
+    .round-card.hidden {
+      display: none;
+    }
+
+    .slot {
+      min-width: 2.75rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 12px;
+      background: #241b16;
+      color: #f7efe2;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      font-size: 0.82rem;
+      text-align: center;
+      line-height: 1;
+      margin-top: 0.1rem;
+    }
+
+    .pick strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 0.18rem;
+    }
+
+    .pick .voter {
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      font-size: 0.86rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .pick.empty {
+      background: rgba(36, 27, 22, 0.08);
+    }
+
+    .pick.empty strong {
+      color: var(--muted);
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    .sidebar-stack {
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .stat-list,
+    .name-list {
+      display: grid;
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+
+    .stat-item,
+    .name-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.8rem 0.9rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(27, 20, 17, 0.08);
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+    }
+
+    .name-item span:last-child,
+    .stat-item span:last-child {
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(27, 20, 17, 0.1);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #241b16;
+      color: #f7efe2;
+      text-align: left;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.76rem;
+      padding: 0.9rem 0.85rem;
+    }
+
+    tbody td {
+      padding: 0.8rem 0.85rem;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    tbody tr.hidden {
+      display: none;
+    }
+
+    .match-cell {
+      font-weight: 700;
+    }
+
+    .empty-cell {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .footer-note {
+      margin-top: 1rem;
+      color: var(--muted);
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      font-size: 0.9rem;
+    }
+
+    .results-meta {
+      color: var(--muted);
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 980px) {
+      .layout,
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100% - 1rem, 1200px);
+        padding-top: 1rem;
+      }
+
+      .hero,
+      .panel {
+        padding: 1.1rem;
+      }
+
+      .pick {
+        grid-template-columns: 1fr;
+      }
+
+      .slot {
+        width: fit-content;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Static Draft Board</div>
+      <h1>Greatest Wrestling Matches Ever</h1>
+      <p class="hero-copy">
+        A single-file draft archive built from your 10-round spreadsheet. Search by wrestler, match, or voter,
+        jump to a round, or scan the full board in one place.
+      </p>
+      <div class="hero-meta" id="hero-meta"></div>
+      <a class="source-link" href="https://docs.google.com/spreadsheets/d/1WHlBxI3iA-namFjFc3frXyi6QfXRRrmWlWGNfiIGFXs/edit?gid=0#gid=0" target="_blank" rel="noreferrer">
+        Open the source Google Sheet
+      </a>
+    </section>
+
+    <section class="panel">
+      <div class="controls">
+        <div class="field">
+          <label for="search">Search the board</label>
+          <input id="search" type="search" placeholder="Try Bret Hart, Okada, WrestleMania, J Ro..." />
+        </div>
+        <div class="field">
+          <label for="round-filter">Round filter</label>
+          <select id="round-filter">
+            <option value="all">All rounds</option>
+          </select>
+        </div>
+      </div>
+      <div class="jump-links" id="jump-links"></div>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <h2>Round By Round</h2>
+            <p>Every pick, grouped by round.</p>
+          </div>
+          <div class="results-meta" id="round-results-meta"></div>
+        </div>
+        <div class="rounds-grid" id="rounds-grid"></div>
+      </section>
+
+      <aside class="sidebar-stack">
+        <section class="panel">
+          <h2>Board Notes</h2>
+          <div class="stat-list" id="stat-list"></div>
+        </section>
+      </aside>
+    </div>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <h2>All Picks</h2>
+          <p>Flat list for fast scanning and browser find.</p>
+        </div>
+        <div class="results-meta" id="table-results-meta"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Slot</th>
+              <th>Round</th>
+              <th>Voter</th>
+              <th>Match</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <p class="footer-note">
+        Blank rows from the sheet are preserved as "No submission listed" so the draft order still lines up with the original board.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const entries = [
+      { round: "Round 1", slot: 1, voter: "Ezra (Brunch Boxing)", match: "Bret Hart vs Steve Austin WM 13" },
+      { round: "Round 1", slot: 2, voter: "Lord", match: "Undertaker vs Shawn Michaels WM25" },
+      { round: "Round 1", slot: 3, voter: "Grey", match: "Kenny Omega vs Kazuchika Okada WK11" },
+      { round: "Round 1", slot: 4, voter: "Bobby", match: "Hulk Hogan vs Andre The Giant" },
+      { round: "Round 1", slot: 5, voter: "Juan (Every Juan Has An Opinion)", match: "Kenny Omega vs Kazuchika Okada Dominion 2018." },
+      { round: "Round 1", slot: 6, voter: "Vivi", match: "Katsuyori Shibata vs Kazuchika Okada" },
+      { round: "Round 1", slot: 7, voter: "J Ro", match: "Bret Hart vs Roddy Piper WM8" },
+      { round: "Round 1", slot: 8, voter: "Kevin", match: "The Rock vs Steve Austin Wm 17" },
+      { round: "Round 1", slot: 9, voter: "King P (Ring Gang Radio)", match: "Ricky Steamboat vs Randy Savage WM3" },
+      { round: "Round 1", slot: 10, voter: "Herman", match: "Bruno Sammartino vs Buddy Rodgers" },
+      { round: "Round 1", slot: 11, voter: "Hitman", match: "Hollywood Hogan vs The Rock WM18" },
+      { round: "Round 1", slot: 12, voter: "Matt (Brunch Boxing)", match: "1992 Royal Rumble" },
+      { round: "Round 2", slot: 13, voter: "Matt", match: "Bret Hart vs Shawn Michaels Survivor Series 1997" },
+      { round: "Round 2", slot: 15, voter: "Hitman", match: "Brock Lesnar vs Kurt Angle Iron Man Match" },
+      { round: "Round 2", slot: 16, voter: "Herman", match: "Randy Savage Vs Ted DiBiase WM4" },
+      { round: "Round 2", slot: 17, voter: "King P", match: "Kenta Kobashi vs Mitsuharu Misawa 2003" },
+      { round: "Round 2", slot: 18, voter: "Kevin", match: "Bret Hart Vs Shawn Michaels WM12" },
+      { round: "Round 2", slot: 19, voter: "TY", match: "" },
+      { round: "Round 2", slot: 20, voter: "J Ro", match: "Bret Hart vs Steve Austin  Survivor Series MSG" },
+      { round: "Round 2", slot: 21, voter: "Vivi", match: "Ric Flair vs Terry Funk I Quit" },
+      { round: "Round 2", slot: 22, voter: "Juan", match: "Shawn Michaels vs Kurt Angle WM21" },
+      { round: "Round 2", slot: 23, voter: "Bobby", match: "NWO vs WCW Bash At The Beach" },
+      { round: "Round 2", slot: 24, voter: "Grey", match: "Bret Vs Owen WM10" },
+      { round: "Round 2", slot: 25, voter: "Lord", match: "RVD vs John Cena One Night Stand 2006" },
+      { round: "Round 2", slot: 26, voter: "Ezra", match: "Ricky Steamboat vs Ric Flair 2 out 3 Fall Clash Of Champions" },
+      { round: "Round 3", slot: 27, voter: "Ezra", match: "Shawn Michaels vs Undertaker WM 26" },
+      { round: "Round 3", slot: 28, voter: "Lord", match: "Bret Hart vs Mr Perfect Summerslam" },
+      { round: "Round 3", slot: 29, voter: "Grey", match: "War Games 92 Dangerous Alliance vs Stings Squadron" },
+      { round: "Round 3", slot: 30, voter: "Bobby", match: "Bret Hart vs Owen Hart Summerslam 1994" },
+      { round: "Round 3", slot: 31, voter: "Juan", match: "Kurt Angle vs Chris Benoit Rumble 2003" },
+      { round: "Round 3", slot: 32, voter: "Vivi", match: "Nick Bockwinkel vs Mr Perfect 60 minutes" },
+      { round: "Round 3", slot: 33, voter: "J Ro", match: "Bret Hart vs British Bulldog Summerslam 92" },
+      { round: "Round 3", slot: 35, voter: "Kevin", match: "Shawn Michaels vs Razor Ramon WM10" },
+      { round: "Round 3", slot: 36, voter: "King P", match: "Shawn Michaels vs Razor Ramon Summerslam" },
+      { round: "Round 3", slot: 37, voter: "Herman", match: "Ric Flair vs Ricky Steamboat Chi Town Rumble" },
+      { round: "Round 3", slot: 38, voter: "Hitman", match: "AJ Styles vs Samoa Joe vs Christopher Daniels TNA Unbreakable" },
+      { round: "Round 3", slot: 39, voter: "Matt", match: "Hell In A Cell KOTR 1998 Undertaker vs Mankind" },
+      { round: "Round 4", slot: 40, voter: "Matt", match: "Randy Savage vs Ultimate Warrior WM 8" },
+      { round: "Round 4", slot: 41, voter: "Hitman", match: "TLC 2" },
+      { round: "Round 4", slot: 42, voter: "Herman", match: "Tully Blanchard vs Magnum T.A. i quit" },
+      { round: "Round 4", slot: 43, voter: "King P", match: "MJF vs Bryan Danielson Iron Man Match" },
+      { round: "Round 4", slot: 44, voter: "Kevin", match: "Stone Cold vs The Rock WM 19" },
+      { round: "Round 4", slot: 45, voter: "TY", match: "" },
+      { round: "Round 4", slot: 46, voter: "J Ro", match: "Bret Hart vs Bam Bam Bigelow KOTR" },
+      { round: "Round 4", slot: 47, voter: "Vivi", match: "Akira Hokuto vs Shinobu Konderi" },
+      { round: "Round 4", slot: 48, voter: "Juan", match: "Chris Benoit vs Shawn Michaels vs HHH WM20" },
+      { round: "Round 4", slot: 49, voter: "Bobby", match: "Hogan vs Savage WM5" },
+      { round: "Round 4", slot: 50, voter: "Grey", match: "Diesel vs Shawn Michaels Good Friends Better Enemies" },
+      { round: "Round 4", slot: 51, voter: "Lord", match: "Eddie Guerrero vs Rey Mysterio summerslam ladder match" },
+      { round: "Round 4", slot: 52, voter: "Ezra", match: "Rey Mysterio vs Juvuntud Guerrero ECW Extreme Bash 1996" },
+      { round: "Round 5", slot: 53, voter: "Ezra", match: "Kenta Kobashi vs Stan Hansen 1993" },
+      { round: "Round 5", slot: 54, voter: "Lord", match: "Onita vs Funk 1993 Exploding Barbedwire" },
+      { round: "Round 5", slot: 55, voter: "Grey", match: "Goldberg vs Hogan Nitro" },
+      { round: "Round 5", slot: 56, voter: "Bobby", match: "Hulk Hogan vs Vince McMahon WM 19" },
+      { round: "Round 5", slot: 57, voter: "Juan", match: "Eddie Guerrero vs Rey Mysterio Halloween Havoc 97" },
+      { round: "Round 5", slot: 58, voter: "Vivi", match: "Perro Aguayo vs Sangre Chicana" },
+      { round: "Round 5", slot: 59, voter: "J Ro", match: "John Cena vs CM Punk MiTB 2011" },
+      { round: "Round 5", slot: 60, voter: "TY", match: "" },
+      { round: "Round 5", slot: 61, voter: "Kevin", match: "Undertaker vs Shawn Michaels Bad Blood 1997" },
+      { round: "Round 5", slot: 62, voter: "King P", match: "Cactus Jack vs HHH Rumble 2000" },
+      { round: "Round 5", slot: 63, voter: "Herman", match: "Sting vs Ric Flair Clash 88'" },
+      { round: "Round 5", slot: 64, voter: "Hitman", match: "John Cena vs Shawn Michaels Raw 2007" },
+      { round: "Round 5", slot: 65, voter: "Matt", match: "Bob Backlund vs Bret Hart Submission Match" },
+      { round: "Round 6", slot: 66, voter: "Matt", match: "Elimination Chamber 2002" },
+      { round: "Round 6", slot: 67, voter: "Hitman", match: "Randy Orton vs Mick Foley Backlash 2004" },
+      { round: "Round 6", slot: 68, voter: "Herman", match: "Paul Orndoff vs Hulk Hogan Steel Cage" },
+      { round: "Round 6", slot: 69, voter: "King P", match: "FTR vs The Briscoes Dog Collar Match!" },
+      { round: "Round 6", slot: 70, voter: "Kevin", match: "Rey Mysterio vs Psicosis Bash At The Beach 1996" },
+      { round: "Round 6", slot: 71, voter: "TY", match: "" },
+      { round: "Round 6", slot: 72, voter: "J Ro", match: "Canadian Stampede Hart Foundation vs Austin, Shamrock, Goldust & LOD" },
+      { round: "Round 6", slot: 73, voter: "Vivi", match: "Rey Mysterio vs Juventud AAA" },
+      { round: "Round 6", slot: 74, voter: "Juan", match: "Young Bucks vs Hangman  Page & Kenny Omega )AEW Revolution 2020" },
+      { round: "Round 6", slot: 75, voter: "Bobby", match: "Ric Flair vs Randy Savage Wrestlemania 8" },
+      { round: "Round 6", slot: 76, voter: "Grey", match: "Darby Allin & Sting vs The Young Bucks" },
+      { round: "Round 6", slot: 77, voter: "Lord", match: "Kenny Omega vs El Hijo Del Vikingo" },
+      { round: "Round 6", slot: 78, voter: "Ezra", match: "Eddie Guerrero vs Brock Lesnar No Way Out!" },
+      { round: "Round 7", slot: 79, voter: "Ezra", match: "WWF vs The Alliance Survivor Series" },
+      { round: "Round 7", slot: 80, voter: "Lord", match: "Gunther vs Sheamus vs Drew McIntyre Wrestlemania 39" },
+      { round: "Round 7", slot: 81, voter: "Grey", match: "Manami Toyota vs Akira Hokuto" },
+      { round: "Round 7", slot: 82, voter: "Bobby", match: "Bam Bam Bigelow vs Taz living dangerously" },
+      { round: "Round 7", slot: 83, voter: "Juan", match: "Shawn Michaels vs Mankind Mind Games" },
+      { round: "Round 7", slot: 84, voter: "Vivi", match: "El Hijo De Santo vs Negro Casas" },
+      { round: "Round 7", slot: 85, voter: "J Ro", match: "Bret Hart vs 123 Kid" },
+      { round: "Round 7", slot: 86, voter: "TY", match: "" },
+      { round: "Round 7", slot: 87, voter: "Kevin", match: "Cactus Jack vs Vader 1993 Halloween Havoc" },
+      { round: "Round 7", slot: 88, voter: "King P", match: "Kurt Angle vs Shane McMahon" },
+      { round: "Round 7", slot: 89, voter: "Herman", match: "Roddy Piper vs Greg The Hammer Valentine Dog Collar Match" },
+      { round: "Round 7", slot: 90, voter: "Hitman", match: "Steiner Bros vs Sting and Luger Superbrawl 91" },
+      { round: "Round 7", slot: 91, voter: "Matt", match: "The Rock vs Mankind RAW January 1999" },
+      { round: "Round 8", slot: 92, voter: "Matt", match: "Cody Rhodes vs Roman Reigns Wrestlemania 40!" },
+      { round: "Round 8", slot: 93, voter: "Hitman", match: "Kurt Angle vs AJ Styles TNA Hard Justice 2008" },
+      { round: "Round 8", slot: 94, voter: "Herman", match: "Jushin Thunder Liger vs Brian Pillman" },
+      { round: "Round 8", slot: 95, voter: "King P", match: "Kenny Omega vs Will Ospreay WK17" },
+      { round: "Round 8", slot: 96, voter: "Kevin", match: "Hangman Page vs Jon Moxley Texas Death Match 2" },
+      { round: "Round 8", slot: 97, voter: "T.Y.", match: "" },
+      { round: "Round 8", slot: 98, voter: "J Ro", match: "Bret Hart vs Diesel survivor Series 1995" },
+      { round: "Round 8", slot: 99, voter: "Vivi", match: "Jushin Thunder Liger vs Naoki Sato" },
+      { round: "Round 8", slot: 100, voter: "Juan", match: "CM Punk vs Brock Lesnar Summerslam 2013" },
+      { round: "Round 8", slot: 101, voter: "Bobby", match: "Ron Simmons vs Vader" },
+      { round: "Round 8", slot: 102, voter: "Grey", match: "Atlantis vs Villano 3 2000" },
+      { round: "Round 8", slot: 103, voter: "Lord", match: "Dynamite Kid vs Tiger Mask" },
+      { round: "Round 8", slot: 104, voter: "Ezra", match: "FTR vs Bullett Club Gold Collision" },
+      { round: "Round 9", slot: 105, voter: "Ezra", match: "The Wyatt Family vs The Shield Elmination Chamber" },
+      { round: "Round 9", slot: 106, voter: "Lord", match: "Samoa Joe vs CM Punk 2 2004 ROH" },
+      { round: "Round 9", slot: 107, voter: "Grey", match: "Harley Race vs Kerry Von Erich. Fritz memorial" },
+      { round: "Round 9", slot: 108, voter: "Bobby", match: "Rick Rude vs Steamboat iron man match" },
+      { round: "Round 9", slot: 109, voter: "Juan", match: "Steve Austin vs Angle Summerslam 01" },
+      { round: "Round 9", slot: 110, voter: "Vivi", match: "Okada vs Tanahashi 2013" },
+      { round: "Round 9", slot: 111, voter: "J Ro", match: "Jerry Lynn vs RVD Hardcore Heaven" },
+      { round: "Round 9", slot: 112, voter: "TY", match: "" },
+      { round: "Round 9", slot: 113, voter: "Kevin", match: "Chris Benoit vs Bret Hart Owen Tribute" },
+      { round: "Round 9", slot: 114, voter: "King P", match: "Toni Storm vs Mariah May Hollywood Ending" },
+      { round: "Round 9", slot: 115, voter: "Herman", match: "Curt Hennig vs Bockwinkel super clash 2" },
+      { round: "Round 9", slot: 116, voter: "Hitman", match: "Steve Austin and HHH vs Benoit and Jericho" },
+      { round: "Round 9", slot: 117, voter: "Matt", match: "Brock Lesnar vs Goldberg WM 33" },
+      { round: "Round 10", slot: 118, voter: "Matt", match: "Steve Austin vs Kevin Owens WM 38" },
+      { round: "Round 10", slot: 119, voter: "Hitman", match: "Batista vs Undertaker WM23" },
+      { round: "Round 10", slot: 120, voter: "Herman", match: "Brock Lesnar vs Undertaker WM30" },
+      { round: "Round 10", slot: 121, voter: "King P", match: "TLC 3" },
+      { round: "Round 10", slot: 122, voter: "Kevin", match: "The Rock vs Triple H backlash 2000" },
+      { round: "Round 10", slot: 123, voter: "T.Y.", match: "" },
+      { round: "Round 10", slot: 124, voter: "J Ro", match: "Bret Hart vs Randy Savage SNME" },
+      { round: "Round 10", slot: 125, voter: "Vivi", match: "Penta vs Black Lotus Triad Gauntlet" },
+      { round: "Round 10", slot: 126, voter: "Juan", match: "Omega Vs Okada 2" },
+      { round: "Round 10", slot: 127, voter: "Bobby", match: "Tito Santana vs Mr Perfect July 1990" },
+      { round: "Round 10", slot: 128, voter: "Grey", match: "Dan Kroffat  & Doug Furnas vs Kenta Kobashi & Tsuyoshi Kikuchi" },
+      { round: "Round 10", slot: 129, voter: "Lord", match: "Bandido vs Hechicero ROH 2025" },
+      { round: "Round 10", slot: 130, voter: "Ezra", match: "Samoa Joe vs Kenta Kobashi ROH" }
+    ];
+
+    const roundOrder = [...new Set(entries.map((entry) => entry.round))];
+    const blankCount = entries.filter((entry) => !entry.match.trim()).length;
+    const filledCount = entries.length - blankCount;
+    const uniqueVoters = new Set(entries.map((entry) => entry.voter)).size;
+
+    const byRound = roundOrder.map((round) => ({
+      round,
+      picks: entries.filter((entry) => entry.round === round)
+    }));
+
+    const normalized = (value) => value.toLowerCase().replace(/\s+/g, " ").trim();
+
+    const heroMeta = document.getElementById("hero-meta");
+    const roundFilter = document.getElementById("round-filter");
+    const jumpLinks = document.getElementById("jump-links");
+    const roundsGrid = document.getElementById("rounds-grid");
+    const tableBody = document.getElementById("table-body");
+    const searchInput = document.getElementById("search");
+    const statList = document.getElementById("stat-list");
+    const roundResultsMeta = document.getElementById("round-results-meta");
+    const tableResultsMeta = document.getElementById("table-results-meta");
+
+    heroMeta.innerHTML = `
+      <div class="meta-pill"><span class="meta-label">Rounds</span><span class="meta-value">${roundOrder.length}</span></div>
+      <div class="meta-pill"><span class="meta-label">Board Slots</span><span class="meta-value">${entries.length}</span></div>
+      <div class="meta-pill"><span class="meta-label">Matches Listed</span><span class="meta-value">${filledCount}</span></div>
+      <div class="meta-pill"><span class="meta-label">Voters</span><span class="meta-value">${uniqueVoters}</span></div>
+    `;
+
+    roundOrder.forEach((round) => {
+      const option = document.createElement("option");
+      option.value = round;
+      option.textContent = round;
+      roundFilter.appendChild(option);
+    });
+
+    jumpLinks.innerHTML = roundOrder
+      .map((round) => `<a href="#${round.toLowerCase().replace(/\s+/g, "-")}">${round}</a>`)
+      .join("");
+
+    statList.innerHTML = `
+      <div class="stat-item"><span>Open rounds on the board</span><span>${roundOrder.length}</span></div>
+      <div class="stat-item"><span>Filled match entries</span><span>${filledCount}</span></div>
+      <div class="stat-item"><span>Blank placeholders kept</span><span>${blankCount}</span></div>
+    `;
+
+    roundsGrid.innerHTML = byRound
+      .map(({ round, picks }) => {
+        const filled = picks.filter((pick) => pick.match.trim()).length;
+        return `
+          <article class="round-card" id="${round.toLowerCase().replace(/\s+/g, "-")}" data-round="${round}">
+            <h3>${round}</h3>
+            <div class="round-meta">${filled} matches listed${filled !== picks.length ? `, ${picks.length - filled} blank slot${picks.length - filled === 1 ? "" : "s"}` : ""}</div>
+            <ol class="round-list">
+              ${picks
+                .map((pick) => `
+                  <li class="pick${pick.match.trim() ? "" : " empty"}" data-round="${pick.round}" data-search="${normalized(`${pick.round} ${pick.voter} ${pick.match || "No submission listed"} ${pick.slot}`)}">
+                    <div class="slot">#${pick.slot}</div>
+                    <div>
+                      <strong>${pick.match.trim() || "No submission listed"}</strong>
+                      <div class="voter">${pick.voter}</div>
+                    </div>
+                  </li>
+                `)
+                .join("")}
+            </ol>
+          </article>
+        `;
+      })
+      .join("");
+
+    tableBody.innerHTML = entries
+      .map((entry) => `
+        <tr data-round="${entry.round}" data-search="${normalized(`${entry.round} ${entry.voter} ${entry.match || "No submission listed"} ${entry.slot}`)}">
+          <td>#${entry.slot}</td>
+          <td>${entry.round}</td>
+          <td>${entry.voter}</td>
+          <td class="${entry.match.trim() ? "match-cell" : "empty-cell"}">${entry.match.trim() || "No submission listed"}</td>
+        </tr>
+      `)
+      .join("");
+
+    function applyFilters() {
+      const query = normalized(searchInput.value);
+      const selectedRound = roundFilter.value;
+      let visibleRows = 0;
+      let visibleRoundCards = 0;
+
+      document.querySelectorAll(".round-card").forEach((card) => {
+        const cardRound = card.dataset.round;
+        const roundMatches = selectedRound === "all" || selectedRound === cardRound;
+        let visiblePicks = 0;
+
+        card.querySelectorAll(".pick").forEach((pick) => {
+          const queryMatches = !query || pick.dataset.search.includes(query);
+          const show = roundMatches && queryMatches;
+          pick.classList.toggle("hidden", !show);
+          if (show) visiblePicks += 1;
+        });
+
+        const showCard = visiblePicks > 0;
+        card.classList.toggle("hidden", !showCard);
+        if (showCard) visibleRoundCards += 1;
+      });
+
+      document.querySelectorAll("#table-body tr").forEach((row) => {
+        const roundMatches = selectedRound === "all" || selectedRound === row.dataset.round;
+        const queryMatches = !query || row.dataset.search.includes(query);
+        const show = roundMatches && queryMatches;
+        row.classList.toggle("hidden", !show);
+        if (show) visibleRows += 1;
+      });
+
+      roundResultsMeta.textContent = `${visibleRoundCards} round${visibleRoundCards === 1 ? "" : "s"} showing`;
+      tableResultsMeta.textContent = `${visibleRows} slot${visibleRows === 1 ? "" : "s"} showing`;
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    roundFilter.addEventListener("change", applyFilters);
+    applyFilters();
+  </script>
+</body>
+</html>
